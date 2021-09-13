@@ -6,7 +6,7 @@
 #include "list.h"
 typedef struct node {
 
-    Info info;
+    List list;
     int height;
     struct node* left;
     struct node* right;
@@ -45,7 +45,7 @@ void recTreeEnd(NodeStruct* root){
     recTreeEnd(root->left);
     recTreeEnd(root->right);
 
-    endList(root->info);
+    endList(root->list);
     free(root);
 }
 
@@ -132,7 +132,7 @@ void rotateRL(NodeStruct* root){
 }
 
 // Função de inserção recursiva
-int recTreeInsert(NodeStruct* root, Info info, int key){
+int recTreeInsert(NodeStruct* root, Info info, double key){
     int res = 0;
     // Nó folha ou primeiro nó
     if(root == NULL){
@@ -141,8 +141,8 @@ int recTreeInsert(NodeStruct* root, Info info, int key){
             return 0;
         }
 
-        new->info = createList();
-        insertListElement(new->info,info);
+        new->list = createList();
+        insertListElement(new->list,info);
         new->left = NULL;
         new->right = NULL;
         new->height = 0;
@@ -177,7 +177,7 @@ int recTreeInsert(NodeStruct* root, Info info, int key){
                 }
             }
         }else{
-            insertListElement(this->info, info);
+            insertListElement(this->list, info);
             return 0;
         }
     }
@@ -188,7 +188,7 @@ int recTreeInsert(NodeStruct* root, Info info, int key){
 }
 
 // Chama a função recursiva de inserir
-int treeInsert(Tree tree, Info info, int key){
+int treeInsert(Tree tree, Info info, double key){
     TreeStruct* treeAux = (TreeStruct* ) tree;
     int aux = recTreeInsert(treeAux->root, info, key);
 
@@ -214,7 +214,7 @@ NodeStruct* searchLesser(NodeStruct* this){
 }
 
 // Função de remoção recursiva
-int recTreeRemove(NodeStruct* root, int key){
+int recTreeRemove(NodeStruct* root, double key){
     int res = 0;
     if(root == NULL){
         return 0;
@@ -255,11 +255,11 @@ int recTreeRemove(NodeStruct* root, int key){
             }else{
                 root = root->right;
             }
-            endList(oldNode->info);
+            endList(oldNode->list);
             free(oldNode);
         }else{
             NodeStruct* temp = searchLesser(root->right);
-            root->info = temp->info;
+            root->list = temp->list;
             recTreeRemove(root->right, root->key);
             if(nodeFactor(root) >= 2){
                 if(nodeHeight(root->left->right) <= nodeHeight(root->left->left)){
@@ -276,7 +276,7 @@ int recTreeRemove(NodeStruct* root, int key){
 }
 
 // Chama a função recursiva de remover
-int treeRemove(Tree tree, int key){
+int treeRemove(Tree tree, double key){
     TreeStruct* treeAux = (TreeStruct* ) tree;
     int aux = recTreeRemove(treeAux->root, key);
 
