@@ -10,14 +10,14 @@ Função: Dado uma arvore, um ponteiro pra Info e uma chave, insere na árvore e
 Pré: void* para a árvore, void* para a info, int com valor.
 Pós: Retorna 1 caso bem sucedido ou 0 para key de valor igual.
 */
-int treeInsert(Tree tree, Info info, int key);
+int treeInsert(Tree tree, Info info, double key);
 
 /*
 Função: Dado uma árvore e uma chave, acha o nó correspondete e o remove da árvore.
 Pré: void* para a árvore, um int com valor.
 Pós: Retorna 1 caso bem sucedido ou 0 para falha.
 */
-int treeRemove(Tree tree, int key);
+int treeRemove(Tree tree, double key);
 
 /*
 Função: Dada uma árvore desaloca todos os nós e a própria árvore.

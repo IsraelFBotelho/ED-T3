@@ -147,11 +147,22 @@ int recTreeInsert(NodeStruct* root, Info info, double key){
         new->right = NULL;
         new->height = 0;
         new->key = key;
+        new->biggerX = key;
+        new->lesserX = key;
 
         return 1;
     }
 
     NodeStruct* this = root;
+
+
+    // Enquanto for passando pelos nós atualiza o maior e menor :)
+    if(this->biggerX < key){
+        this->biggerX = key;
+    }
+    if(this->lesserX > key){
+        this->lesserX = key;
+    }
 
     // Adiciona a esquerda e se precisar rotaciona a arvore
     if(key < this->key){
@@ -208,6 +219,19 @@ NodeStruct* searchLesser(NodeStruct* this){
     while(node2 != NULL){
         node1 = node2;
         node2 = node2->left;
+    }
+
+    return node1;
+}
+
+// Busca o maior nó
+NodeStruct* searchBigger(NodeStruct* this){
+    NodeStruct* node1 = this;
+    NodeStruct* node2 = this->right;
+
+    while(node2 != NULL){
+        node1 = node2;
+        node2 = node2->right;
     }
 
     return node1;
@@ -271,6 +295,12 @@ int recTreeRemove(NodeStruct* root, double key){
         }
         return 1;
     }
+
+    NodeStruct* big = searchBigger(root->right);
+    NodeStruct* small = searchLesser(root->left);
+    root->biggerX = big->key;
+    root->lesserX = small->key;
+
 
     return res;
 }
