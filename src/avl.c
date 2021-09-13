@@ -3,14 +3,16 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
-
+#include "list.h"
 typedef struct node {
 
     Info info;
     int height;
     struct node* left;
     struct node* right;
-    int key;
+    double key;
+    double lesserX;
+    double biggerX;
 
 }NodeStruct;
 
@@ -43,6 +45,7 @@ void recTreeEnd(NodeStruct* root){
     recTreeEnd(root->left);
     recTreeEnd(root->right);
 
+    endList(root->info);
     free(root);
 }
 
@@ -138,7 +141,8 @@ int recTreeInsert(NodeStruct* root, Info info, int key){
             return 0;
         }
 
-        new->info = info;
+        new->info = createList();
+        insertListElement(new->info,info);
         new->left = NULL;
         new->right = NULL;
         new->height = 0;
@@ -173,7 +177,7 @@ int recTreeInsert(NodeStruct* root, Info info, int key){
                 }
             }
         }else{
-            // Valor igual então não é inserido
+            insertListElement(this->info, info);
             return 0;
         }
     }
@@ -196,6 +200,7 @@ int treeInsert(Tree tree, Info info, int key){
 
 }
 
+// Busca o menor nó
 NodeStruct* searchLesser(NodeStruct* this){
     NodeStruct* node1 = this;
     NodeStruct* node2 = this->left;
@@ -250,6 +255,7 @@ int recTreeRemove(NodeStruct* root, int key){
             }else{
                 root = root->right;
             }
+            endList(oldNode->info);
             free(oldNode);
         }else{
             NodeStruct* temp = searchLesser(root->right);

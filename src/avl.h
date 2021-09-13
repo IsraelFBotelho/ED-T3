@@ -8,7 +8,7 @@ typedef void* Node;
 /*
 Função: Dado uma arvore, um ponteiro pra Info e uma chave, insere na árvore e balanceia-a.
 Pré: void* para a árvore, void* para a info, int com valor.
-Pós: Retorna 1 caso bem sucedido ou 0 para falha.
+Pós: Retorna 1 caso bem sucedido ou 0 para key de valor igual.
 */
 int treeInsert(Tree tree, Info info, int key);
 
