@@ -1,5 +1,5 @@
 # Name of the project
-objects = progr
+objects = t1
 
 # .c files
 C_SOURCE=$(wildcard *.c)

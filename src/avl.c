@@ -33,9 +33,33 @@ Tree treeCreate(char type[20]){
     return new;
 }
 
-// void treeEnd(){
+// Encerra recursivamente nó por nó da árvore
+void recTreeEnd(NodeStruct* root){
 
-// }
+    if(root == NULL){
+        return;
+    }
+
+    recTreeEnd(root->left);
+    recTreeEnd(root->right);
+
+    free(root);
+}
+
+// Encerra toda a árvore
+int treeEnd(Tree tree){
+    TreeStruct* treeAux = (TreeStruct* ) tree;
+
+    if(treeAux == NULL){
+        return 0;
+    }
+
+    recTreeEnd(treeAux->root);
+
+    free(treeAux);
+
+    return 1;
+}
 
 // Retorna a altura do nó, caso o nó não exista retorna -1
 int nodeHeight(NodeStruct* node){
