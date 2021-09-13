@@ -296,6 +296,7 @@ int recTreeRemove(NodeStruct* root, double key){
         return 1;
     }
 
+    // Caso remova o nó troca os maiores e menores
     NodeStruct* big = searchBigger(root->right);
     NodeStruct* small = searchLesser(root->left);
     root->biggerX = big->key;
@@ -315,4 +316,36 @@ int treeRemove(Tree tree, double key){
     }
 
     return aux;
+}
+
+// Recursivamente busca com a key a lista com os valores
+List recTreeSearch(NodeStruct* root, double key){
+    if(root == NULL){
+        return  NULL;
+    }
+
+    if(root->key == key){
+        return root->list;
+    }
+
+    if(key > root->biggerX || key < root->lesserX){
+        return NULL;
+    }
+
+    List aux;
+
+    if(key > root->key){
+        aux = recTreeSearch(root->right, key);
+    }else{
+        aux = recTreeSearch(root->left, key);
+    }
+
+    return aux;
+}
+
+// Chama a função que retorna a lista
+List treeSearch(Tree tree, double key){
+    TreeStruct* treeAux = (TreeStruct* ) tree;
+
+    return recTreeSearch(treeAux->root, key);
 }
