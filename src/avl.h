@@ -5,6 +5,10 @@ typedef void* Info;
 typedef void* Tree;
 typedef void* Node;
 
+#include "list.h"
+#include "hashtable.h"
+
+
 /*
 Função: Dado uma arvore, um ponteiro pra Info e uma chave, insere na árvore e balanceia-a.
 Pré: void* para a árvore, void* para a info, double com valor.

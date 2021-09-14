@@ -94,7 +94,7 @@ void rotateLL(NodeStruct** root){
 
     (*root)->left = node->right;
 
-    node->right = root;
+    node->right = (*root);
 
     (*root)->height = biggest(nodeHeight((*root)->left), nodeHeight((*root)->right)) + 1;
 
@@ -166,7 +166,7 @@ int recTreeInsert(NodeStruct** root, Info info, double key){
 
     // Adiciona a esquerda e se precisar rotaciona a arvore
     if(key < this->key){
-        if((res=recTreeInsert(this->left, info, key)) == 1){
+        if((res=recTreeInsert(&(this->left), info, key)) == 1){
             if(nodeFactor(this) >= 2){
                 if(key < this->left->key){
                     rotateLL(root);
@@ -178,7 +178,7 @@ int recTreeInsert(NodeStruct** root, Info info, double key){
     }else{
         // Adiciona a direita e se precisar rotaciona a arvore
         if(key > this->key){
-            if((res = recTreeInsert(this->right, info, key)) == 1){
+            if((res = recTreeInsert(&(this->right), info, key)) == 1){
                 if(nodeFactor(this) >= 2){
                     if(key > this->right->key){
                         rotateRR(root);
@@ -201,7 +201,7 @@ int recTreeInsert(NodeStruct** root, Info info, double key){
 // Chama a função recursiva de inserir
 int treeInsert(Tree tree, Info info, double key){
     TreeStruct* treeAux = (TreeStruct* ) tree;
-    int aux = recTreeInsert(treeAux->root, info, key);
+    int aux = recTreeInsert(&(treeAux->root), info, key);
 
     if(aux == 1){
         treeAux->size++;
@@ -246,7 +246,7 @@ int recTreeRemove(NodeStruct** root, double key){
 
     // Se for menor que o nó atual vai para a esquerda e balanceia se precisar
     if(key < (*root)->key){
-        if((res = recTreeRemove((*root)->left, key)) == 1){
+        if((res = recTreeRemove(&(*root)->left, key)) == 1){
             if(nodeFactor(*root) >= 2){
                 if(nodeHeight((*root)->right->left) <= nodeHeight((*root)->right->right)){
                     rotateRR(root);
@@ -259,7 +259,7 @@ int recTreeRemove(NodeStruct** root, double key){
 
     // Se for maior que o nó atual vai para o nó da direita e balanceia se precisar
     if(key > (*root)->key){
-        if((res = recTreeRemove((*root)->right, key)) == 1){
+        if((res = recTreeRemove(&(*root)->right, key)) == 1){
             if(nodeFactor(*root) >= 2){
                 if(nodeHeight((*root)->left->right) <= nodeHeight((*root)->left->left)){
                     rotateLL(root);
@@ -284,7 +284,7 @@ int recTreeRemove(NodeStruct** root, double key){
         }else{
             NodeStruct* temp = searchLesser((*root)->right);
             (*root)->list = temp->list;
-            recTreeRemove((*root)->right, (*root)->key);
+            recTreeRemove(&(*root)->right, (*root)->key);
             if(nodeFactor(*root) >= 2){
                 if(nodeHeight((*root)->left->right) <= nodeHeight((*root)->left->left)){
                     rotateLL(root);
@@ -309,7 +309,7 @@ int recTreeRemove(NodeStruct** root, double key){
 // Chama a função recursiva de remover
 int treeRemove(Tree tree, double key){
     TreeStruct* treeAux = (TreeStruct* ) tree;
-    int aux = recTreeRemove(treeAux->root, key);
+    int aux = recTreeRemove(&(treeAux->root), key);
 
     if(aux == 1){
         treeAux->size--;

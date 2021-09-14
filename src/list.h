@@ -1,9 +1,10 @@
 #ifndef __LIST_H
 #define __LIST_H
 
-#include "avl.h"
 typedef void* List;
 typedef void* NodeL;
+
+#include "avl.h"
 
 /*
 Função: Cria Uma lista dinamica.
