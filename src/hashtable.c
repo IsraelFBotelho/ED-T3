@@ -57,6 +57,12 @@ int hashTableEnd(HashTable table){
 
     if(tableAux->nodes != NULL){
         for(int i = 0;i < tableAux->size; i++){
+            for(NodeL nodeAux = getListFirst(tableAux->nodes[i].list); nodeAux; nodeAux = getListNext(nodeAux)){
+                Item* item = (Item* ) getListInfo(nodeAux);
+                if(item != NULL){
+                    free(item);
+                }
+            }
             endList(tableAux->nodes[i].list);
         }
 
@@ -88,6 +94,7 @@ int hashTableInsert(HashTable table, char key[50], Info info){
     return 1;
 }
 
+// Função que acessa o endereço do hash, percorre a lista e deleta o Item
 int hashTableRemove(HashTable table, char key[50]){
     HashTableStruct* tableAux = (HashTableStruct* ) table;
     int res = 0;
@@ -103,8 +110,10 @@ int hashTableRemove(HashTable table, char key[50]){
         Item* item = (Item*) getListInfo(nodeAux);
 
         if(strcmp(key, item->key) == 1){
-            free(item);
-            res = 1;
+            if(item != NULL){
+                free(item);
+                res = 1;
+            }
             break;
         }
     }
