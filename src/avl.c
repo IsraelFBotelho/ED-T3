@@ -4,6 +4,12 @@
 #include <stdlib.h>
 #include <math.h>
 #include "list.h"
+
+typedef struct item {
+    List list;
+    char key[50];
+}Item;
+
 typedef struct node {
 
     List list;
@@ -272,24 +278,26 @@ int recTreeRemove(NodeStruct** root, double key){
 
     // Se for igual ao valor do nó o remove e balanceia se precisar
     if(key == (*root)->key){
-        if((*root)->left == NULL || (*root)->right == NULL){
-            NodeStruct* oldNode = (*root);
-            if((*root)->left != NULL){
-                (*root) = (*root)->left;
-            }else{
-                (*root) = (*root)->right;
-            }
-            endList(oldNode->list);
-            free(oldNode);
-        }else{
-            NodeStruct* temp = searchLesser((*root)->right);
-            (*root)->list = temp->list;
-            recTreeRemove(&(*root)->right, (*root)->key);
-            if(nodeFactor(*root) >= 2){
-                if(nodeHeight((*root)->left->right) <= nodeHeight((*root)->left->left)){
-                    rotateLL(root);
+        if(getListSize((*root)->list) == 1){
+            if((*root)->left == NULL || (*root)->right == NULL){
+                NodeStruct* oldNode = (*root);
+                if((*root)->left != NULL){
+                    (*root) = (*root)->left;
                 }else{
-                    rotateLR(root);
+                    (*root) = (*root)->right;
+                }
+                endList(oldNode->list);
+                free(oldNode);
+            }else{
+                NodeStruct* temp = searchLesser((*root)->right);
+                (*root)->list = temp->list;
+                recTreeRemove(&(*root)->right, (*root)->key);
+                if(nodeFactor(*root) >= 2){
+                    if(nodeHeight((*root)->left->right) <= nodeHeight((*root)->left->left)){
+                        rotateLL(root);
+                    }else{
+                        rotateLR(root);
+                    }
                 }
             }
         }
