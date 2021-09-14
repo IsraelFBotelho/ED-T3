@@ -23,6 +23,17 @@ typedef struct hashTable{
 
 }HashTableStruct;
 
+// Retorna um int positivo com valor de hash
+unsigned long int hashIndex(char key[50], int size){
+    unsigned long int hash;
+
+    for (hash = 0; *key != '\0'; key++)
+        hash = *key + 31*hash;
+
+    return hash % size;
+}
+
+// Cria a tabela, aloca cada nó e inicia cada lista de cada nó
 HashTable hashTableCreate(int size){
     HashTableStruct* new = (HashTableStruct* ) malloc(sizeof(HashTableStruct));
 
@@ -36,6 +47,7 @@ HashTable hashTableCreate(int size){
     return new;
 }
 
+// Deleta a tabela e se tiver nó deleta eles e as listas
 int hashTableEnd(HashTable table){
     HashTableStruct* tableAux = (HashTableStruct* ) malloc(sizeof(HashTableStruct));
 
@@ -53,4 +65,49 @@ int hashTableEnd(HashTable table){
     free(tableAux);
 
     return 1;
+}
+
+// Função de inserir um valor na hashtable
+int hashTableInsert(HashTable table, char key[50], Info info){
+    HashTableStruct* tableAux = (HashTableStruct* ) table;
+
+    if((key == NULL || info == NULL) || table == NULL){
+        return 0;
+    }
+
+    Item* new = (Item* ) malloc(sizeof(Item));
+
+    // Preencho o item para caso de conflito
+    strcpy(new->key, key);
+    new->info = info;
+
+    // Função hash para o index
+    int index = hashIndex(key, tableAux->size);
+    insertListElement(tableAux->nodes[index].list, new);
+
+    return 1;
+}
+
+int hashTableRemove(HashTable table, char key[50]){
+    HashTableStruct* tableAux = (HashTableStruct* ) table;
+    int res = 0;
+    if(key == NULL || table == NULL){
+        return 0;
+    }
+
+    // Função hash para o index
+    int index = hashIndex(key, tableAux->size);
+
+    // Percorre a lista e se encontrar o CEP da free() no item
+    for(NodeL nodeAux = getListFirst(tableAux->nodes[index].list); nodeAux; nodeAux = getListNext(tableAux->nodes[index].list, nodeAux)){
+        Item* item = (Item*) getListInfo(nodeAux);
+
+        if(strcmp(key, item->key) == 1){
+            free(item);
+            res = 1;
+            break;
+        }
+    }
+
+    return res;
 }
