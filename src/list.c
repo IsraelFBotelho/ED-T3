@@ -121,14 +121,14 @@ Node getListFirst(List list){
 }
 
 // Função que retorna o próximo elemento
-Node getListNext(List list, NodeL node){
+Node getListNext(NodeL node){
     NodeStruct *nodeAux = (NodeStruct *) node;
 
     return nodeAux->next;
 }
 
 // Função que retorna o elemento anterior
-Node getListBack(List list, NodeL node){
+Node getListBack(NodeL node){
     NodeStruct *nodeAux = (NodeStruct *) node;
 
     return nodeAux->back;

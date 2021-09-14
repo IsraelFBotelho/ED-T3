@@ -43,17 +43,17 @@ Info getListInfo(NodeL node);
 
 /*
 Função: Recupera o proximo no apontado por outro no na lista dinamica.
-Pré: Um void* com o endereço da lista, Um void* com o endereço do no.
+Pré: Um void* com o endereço do no.
 Pós: Um void* com o endereço do no.
 */
-Node getListNext(List list, NodeL node);
+Node getListNext(NodeL node);
 
 /*
 Função: Recupera o no anterior apontado por outro no na lista dinamica.
-Pré: Um void* com o endereço da lista, Um void* com o endereço do no.
+Pré: Um void* com o endereço do no.
 Pós: Um void* com o endereço do no.
 */
-Node getListBack(List list, NodeL node);
+Node getListBack(NodeL node);
 
 /*
 Função: Recupera o primeiro no de uma lista dinamica.

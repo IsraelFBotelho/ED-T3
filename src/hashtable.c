@@ -49,7 +49,7 @@ HashTable hashTableCreate(int size){
 
 // Deleta a tabela e se tiver nó deleta eles e as listas
 int hashTableEnd(HashTable table){
-    HashTableStruct* tableAux = (HashTableStruct* ) malloc(sizeof(HashTableStruct));
+    HashTableStruct* tableAux = (HashTableStruct* ) table;
 
     if(tableAux == NULL){
         return 0;
@@ -99,7 +99,7 @@ int hashTableRemove(HashTable table, char key[50]){
     int index = hashIndex(key, tableAux->size);
 
     // Percorre a lista e se encontrar o CEP da free() no item
-    for(NodeL nodeAux = getListFirst(tableAux->nodes[index].list); nodeAux; nodeAux = getListNext(tableAux->nodes[index].list, nodeAux)){
+    for(NodeL nodeAux = getListFirst(tableAux->nodes[index].list); nodeAux; nodeAux = getListNext(nodeAux)){
         Item* item = (Item*) getListInfo(nodeAux);
 
         if(strcmp(key, item->key) == 1){
@@ -110,4 +110,28 @@ int hashTableRemove(HashTable table, char key[50]){
     }
 
     return res;
+}
+
+// Acessa o endereço do hash e percorre a lista retornando o Info se existir
+Info hashTableSearch(HashTable table, char key[50]){
+    HashTableStruct* tableAux = (HashTableStruct* ) table;
+
+    if(key == NULL || table == NULL){
+        return NULL;
+    }
+
+    // Função hash para o index
+    int index = hashIndex(key, tableAux->size);
+
+    // Percorre a lista e se encontrar o CEP da free() no item
+    for(NodeL nodeAux = getListFirst(tableAux->nodes[index].list); nodeAux; nodeAux = getListNext(nodeAux)){
+        Item* item = (Item*) getListInfo(nodeAux);
+
+        if(strcmp(key, item->key) == 1){
+            return item->info;
+            break;
+        }
+    }
+
+    return NULL;
 }
