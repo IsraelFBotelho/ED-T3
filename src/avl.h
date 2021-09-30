@@ -11,17 +11,17 @@ typedef void* Node;
 
 /*
 Função: Dado uma arvore, um ponteiro pra Info e uma chave, insere na árvore e balanceia-a.
-Pré: void* para a árvore, void* para a info, double com valor.
+Pré: void* para a árvore, void* para a info, double com valor de x, double com valor de y.
 Pós: Retorna 1 caso bem sucedido ou 0 para key de valor igual.
 */
-int treeInsert(Tree tree, Info info, double key);
+int treeInsert(Tree tree, Info info, double keyX, double keyY);
 
 /*
 Função: Dado uma árvore e uma chave, acha o nó correspondete e o remove da árvore.
-Pré: void* para a árvore, um double com valor.
+Pré: void* para a árvore,double com valor de x, um double com valor de y.
 Pós: Retorna 1 caso bem sucedido ou 0 para falha.
 */
-int treeRemove(Tree tree, double key);
+int treeRemove(Tree tree, double keyX, double keyY);
 
 /*
 Função: Dada uma árvore desaloca todos os nós e a própria árvore.
@@ -38,9 +38,38 @@ Pós: Retorna um void* com o endereço da árvore.
 Tree treeCreate(char type[20]);
 
 /*
-Função: Busca e recupera a lista com todos os dados correspondete a key
-Pré: void* para a árvore, double com valor
-Pós:
+Função: Busca e recupera um info correspondente a chave X e Y;
+Pré: void* para a árvore, double com valor de x, double com o valor de y;
+Pós: Retorna void* com a info se existir ou NULL caso não encontre.
 */
-List treeSearch(Tree tree, double key);
+Info treeSearch(Tree tree, double keyX,  double keyY);
+
+/*
+Função: Retorna o nó a direita dessa subarvore;
+Pré: void* para a raiz da subarvore;
+Pós: Retorna void* com o endereço do nó a direita ou NULL se não existir.
+*/
+Node getTreeRight(Node root);
+
+/*
+Função: Retorna o nó a esquerda dessa subarvore;
+Pré: void* para a raiz da subarvore;
+Pós: Retorna void* com o endereço do nó a esquerda ou NULL se não existir.
+*/
+Node getTreeLeft(Node root);
+
+/*
+Função: Retorna a raiz de uma estrutura de árvore;
+Pré: void* para a árvore;
+Pós: Retorna void* com o nó.
+*/
+Node getTreeRoot(Tree tree);
+
+/*
+Função: Busca e recupera uma lista com todos os dados do nó;
+Pré: void* para o nó;
+Pós: Retorna void* com a info se existir ou NULL caso não encontre.
+*/
+List getTreeNodeItens(Node root);
+
 #endif

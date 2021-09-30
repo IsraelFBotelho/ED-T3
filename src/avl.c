@@ -4,10 +4,14 @@
 #include <stdlib.h>
 #include <math.h>
 #include "list.h"
+#define FLAG_STOP_REMOVE -9999
 
-typedef struct item {
-    List list;
-    char key[50];
+typedef struct item{
+
+    Info info;
+    double keyX;
+    double keyY;
+
 }Item;
 
 typedef struct node {
@@ -50,6 +54,13 @@ void recTreeEnd(NodeStruct* root){
 
     recTreeEnd(root->left);
     recTreeEnd(root->right);
+
+    for(NodeL* nodeAux = getListFirst(root->list); nodeAux; nodeAux = getListNext(nodeAux)){
+        Item* item = (Item* ) getListInfo(nodeAux);
+        if(item != NULL){
+            free(item);
+        }
+    }
 
     endList(root->list);
     free(root);
@@ -138,7 +149,7 @@ void rotateRL(NodeStruct** root){
 }
 
 // Função de inserção recursiva
-int recTreeInsert(NodeStruct** root, Info info, double key){
+int recTreeInsert(NodeStruct** root, Info info, double keyX, double keyY){
     int res = 0;
     // Nó folha ou primeiro nó
     if(*root == NULL){
@@ -147,14 +158,19 @@ int recTreeInsert(NodeStruct** root, Info info, double key){
             return 0;
         }
 
+        Item* item = (Item*) malloc(sizeof(Item));
+        item->info = info;
+        item->keyX = keyX;
+        item->keyY = keyY;
+
         new->list = createList();
-        insertListElement(new->list,info);
+        insertListElement(new->list,item);
         new->left = NULL;
         new->right = NULL;
         new->height = 0;
-        new->key = key;
-        new->biggerX = key;
-        new->lesserX = key;
+        new->key = keyX;
+        new->biggerX = keyX;
+        new->lesserX = keyX;
         *root = new;
         return 1;
     }
@@ -163,18 +179,18 @@ int recTreeInsert(NodeStruct** root, Info info, double key){
 
 
     // Enquanto for passando pelos nós atualiza o maior e menor :)
-    if(this->biggerX < key){
-        this->biggerX = key;
+    if(this->biggerX < keyX){
+        this->biggerX = keyX;
     }
-    if(this->lesserX > key){
-        this->lesserX = key;
+    if(this->lesserX > keyX){
+        this->lesserX = keyX;
     }
 
     // Adiciona a esquerda e se precisar rotaciona a arvore
-    if(key < this->key){
-        if((res=recTreeInsert(&(this->left), info, key)) == 1){
+    if(keyX < this->key){
+        if((res=recTreeInsert(&(this->left), info, keyX, keyY)) == 1){
             if(nodeFactor(this) >= 2){
-                if(key < this->left->key){
+                if(keyX < this->left->key){
                     rotateLL(root);
                 }else{
                     rotateLR(root);
@@ -183,10 +199,10 @@ int recTreeInsert(NodeStruct** root, Info info, double key){
         }
     }else{
         // Adiciona a direita e se precisar rotaciona a arvore
-        if(key > this->key){
-            if((res = recTreeInsert(&(this->right), info, key)) == 1){
+        if(keyX > this->key){
+            if((res = recTreeInsert(&(this->right), info, keyX, keyY)) == 1){
                 if(nodeFactor(this) >= 2){
-                    if(key > this->right->key){
+                    if(keyX > this->right->key){
                         rotateRR(root);
                     }else{
                         rotateRL(root);
@@ -194,7 +210,11 @@ int recTreeInsert(NodeStruct** root, Info info, double key){
                 }
             }
         }else{
-            insertListElement(this->list, info);
+            Item* item = malloc(sizeof(Item));
+            item->info = info;
+            item->keyX = keyX;
+            item->keyY = keyY;
+            insertListElement(this->list, item);
             return 0;
         }
     }
@@ -205,9 +225,9 @@ int recTreeInsert(NodeStruct** root, Info info, double key){
 }
 
 // Chama a função recursiva de inserir
-int treeInsert(Tree tree, Info info, double key){
+int treeInsert(Tree tree, Info info, double keyX, double keyY){
     TreeStruct* treeAux = (TreeStruct* ) tree;
-    int aux = recTreeInsert(&(treeAux->root), info, key);
+    int aux = recTreeInsert(&(treeAux->root), info, keyX, keyY);
 
     if(aux == 1){
         treeAux->size++;
@@ -244,15 +264,15 @@ NodeStruct* searchBigger(NodeStruct* this){
 }
 
 // Função de remoção recursiva
-int recTreeRemove(NodeStruct** root, double key){
+int recTreeRemove(NodeStruct** root, double keyX, double keyY){
     int res = 0;
     if(*root == NULL){
         return 0;
     }
 
     // Se for menor que o nó atual vai para a esquerda e balanceia se precisar
-    if(key < (*root)->key){
-        if((res = recTreeRemove(&(*root)->left, key)) == 1){
+    if(keyX < (*root)->key){
+        if((res = recTreeRemove(&(*root)->left, keyX, keyY)) == 1){
             if(nodeFactor(*root) >= 2){
                 if(nodeHeight((*root)->right->left) <= nodeHeight((*root)->right->right)){
                     rotateRR(root);
@@ -264,8 +284,8 @@ int recTreeRemove(NodeStruct** root, double key){
     }
 
     // Se for maior que o nó atual vai para o nó da direita e balanceia se precisar
-    if(key > (*root)->key){
-        if((res = recTreeRemove(&(*root)->right, key)) == 1){
+    if(keyX > (*root)->key){
+        if((res = recTreeRemove(&(*root)->right, keyX, keyY)) == 1){
             if(nodeFactor(*root) >= 2){
                 if(nodeHeight((*root)->left->right) <= nodeHeight((*root)->left->left)){
                     rotateLL(root);
@@ -276,9 +296,18 @@ int recTreeRemove(NodeStruct** root, double key){
         }
     }
 
+    if(keyX == (*root)->key && (getListSize((*root)->list) > 0 && keyY != FLAG_STOP_REMOVE)){
+        for(NodeL nodeAux = getListFirst((*root)->list); nodeAux; nodeAux = getListNext(nodeAux)){
+            Item* item = (Item* ) getListInfo(nodeAux);
+            if(keyY == item->keyY){
+                removeListNode((*root)->list, nodeAux);
+                break;
+            }
+        }
+    }
+
     // Se for igual ao valor do nó o remove e balanceia se precisar
-    if(key == (*root)->key){
-        if(getListSize((*root)->list) == 1){
+    if(keyX == (*root)->key && getListSize((*root)->list) == 0){
             if((*root)->left == NULL || (*root)->right == NULL){
                 NodeStruct* oldNode = (*root);
                 if((*root)->left != NULL){
@@ -286,12 +315,17 @@ int recTreeRemove(NodeStruct** root, double key){
                 }else{
                     (*root) = (*root)->right;
                 }
+
+                Item* item = (Item* ) getListInfo(oldNode->list);
+                free(item);
+
                 endList(oldNode->list);
+            
                 free(oldNode);
             }else{
                 NodeStruct* temp = searchLesser((*root)->right);
                 (*root)->list = temp->list;
-                recTreeRemove(&(*root)->right, (*root)->key);
+                recTreeRemove(&(*root)->right, (*root)->key, FLAG_STOP_REMOVE);
                 if(nodeFactor(*root) >= 2){
                     if(nodeHeight((*root)->left->right) <= nodeHeight((*root)->left->left)){
                         rotateLL(root);
@@ -300,7 +334,6 @@ int recTreeRemove(NodeStruct** root, double key){
                     }
                 }
             }
-        }
         return 1;
     }
 
@@ -315,9 +348,9 @@ int recTreeRemove(NodeStruct** root, double key){
 }
 
 // Chama a função recursiva de remover
-int treeRemove(Tree tree, double key){
+int treeRemove(Tree tree, double keyX, double keyY){
     TreeStruct* treeAux = (TreeStruct* ) tree;
-    int aux = recTreeRemove(&(treeAux->root), key);
+    int aux = recTreeRemove(&(treeAux->root), keyX, keyY);
 
     if(aux == 1){
         treeAux->size--;
@@ -327,33 +360,84 @@ int treeRemove(Tree tree, double key){
 }
 
 // Recursivamente busca com a key a lista com os valores
-List recTreeSearch(NodeStruct* root, double key){
+List recTreeSearch(NodeStruct* root, double keyX){
     if(root == NULL){
         return  NULL;
     }
 
-    if(root->key == key){
+    if(root->key == keyX){
         return root->list;
     }
 
-    if(key > root->biggerX || key < root->lesserX){
+    if(keyX > root->biggerX || keyX < root->lesserX){
         return NULL;
     }
 
     List aux;
 
-    if(key > root->key){
-        aux = recTreeSearch(root->right, key);
+    if(keyX > root->key){
+        aux = recTreeSearch(root->right, keyX);
     }else{
-        aux = recTreeSearch(root->left, key);
+        aux = recTreeSearch(root->left, keyX);
     }
 
     return aux;
 }
 
 // Chama a função que retorna a lista
-List treeSearch(Tree tree, double key){
+Info treeSearch(Tree tree, double keyX,  double keyY){
     TreeStruct* treeAux = (TreeStruct* ) tree;
 
-    return recTreeSearch(treeAux->root, key);
+    List* list = recTreeSearch(treeAux->root, keyX);
+
+    for(NodeL* nodeAux = getListFirst(list); nodeAux; nodeAux = getListNext(nodeAux)){
+        Item* item = getListInfo(nodeAux);
+
+        if(item->keyX == keyX && item->keyY == keyY){
+            return item->info;
+        }
+    }
+
+    return NULL;
+}
+
+// Retorna o nó à direita
+Node getTreeRight(Node root){
+    NodeStruct* rootAux = (NodeStruct* ) root;
+
+    return rootAux->right;
+}
+
+// Retorna o nó à esquerda
+Node getTreeLeft(Node root){
+    NodeStruct* rootAux = (NodeStruct* ) root;
+
+    return rootAux->left;
+}
+
+// Retorna a raiz da árvore
+Node getTreeRoot(Tree tree){
+    TreeStruct* treeAux = (TreeStruct* ) tree;
+
+    return treeAux->root;
+}
+
+// Gera uma lista com os Infos de um nó caso queira obte-los por inteiro
+List getTreeNodeItens(Node root){
+    NodeStruct* rootAux = (NodeStruct* ) root;
+    if(rootAux == NULL){
+        return NULL;
+    }
+    if(rootAux->list || getListSize(rootAux->list) == 0){
+        return NULL;
+    }
+
+    List list = createList();
+    for(NodeL nodeAux = getListFirst(rootAux->list); nodeAux; nodeAux = getListNext(nodeAux)){
+        Item* item = getListInfo(nodeAux);
+
+        insertListElement(list, item->info);
+    }
+
+    return list;
 }

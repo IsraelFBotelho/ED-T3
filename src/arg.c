@@ -33,11 +33,13 @@ void readArg(int argc, char** argv, char** pathOut, char** pathIn, char** nameAr
             *nameArqPm = (char *) malloc((strlen(argv[i])+ 1) * sizeof(char));
             strcpy(*nameArqPm, argv[i]);
         i++;
-    }
+        }
 
-    if(!*pathOut || !*nameArqGeo){
-        printf("Caminho de saida e/ou nome do arquivo .geo nao encontrado!\n");
-        exit(1);
+        if(!*pathOut || !*nameArqGeo){
+            printf("Caminho de saida e/ou nome do arquivo .geo nao encontrado!\n");
+            exit(1);
+        }
+
     }
 
 }
