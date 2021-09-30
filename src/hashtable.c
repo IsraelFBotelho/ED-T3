@@ -145,3 +145,30 @@ Info hashTableSearch(HashTable table, char key[50]){
     return NULL;
 }
 
+List getHashTableList(HashTable table, int index){
+    HashTableStruct* tableAux = (HashTableStruct* ) table;
+
+    if(tableAux == NULL){
+        return NULL;
+    }
+
+    if(index >= tableAux->size){
+        return NULL;
+    }
+
+    List list = createList();
+
+    for(NodeL nodeAux = getListFirst(tableAux->nodes[index].list); nodeAux; nodeAux = getListNext(nodeAux)){
+        Item* item = (Item*) getListInfo(nodeAux);
+
+        insertListElement(list, item->info);
+    }
+    
+    return list;
+}
+
+int getHashTableSize(HashTable table){
+    HashTableStruct* tableAux = (HashTableStruct* ) table;
+
+    return tableAux->size; 
+}

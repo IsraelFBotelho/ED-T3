@@ -40,4 +40,8 @@ Pós: Retorna um void* com a informação.
 */
 Info hashTableSearch(HashTable table, char key[50]);
 
+List getHashTableList(HashTable table, int index);
+
+int getHashTableSize(HashTable table);
+
 #endif
