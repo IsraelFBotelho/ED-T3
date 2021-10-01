@@ -21,6 +21,8 @@ Pós: Retorna um int caso bem sucedido ou 0 para falha.
 */
 int cityEnd(City city);
 
+int cityInsert(City city, Info info, double keyY, double keyX, char* keyHash);
+
 /*
 Função: Recupera a estrutura de árvore na estrutura de cidade;
 Pré: Um void* com o endereço da cidade;

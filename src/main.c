@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-// #include "geo.h"
+#include "geo.h"
 #include "arg.h"
-// #include "svg.h"
+#include "svg.h"
 // #include "qry.h"
-#include "hashtable.h"
-#include "avl.h"
+#include "city.h"
+#include "block.h"
 
 int main(int argc, char* argv[]){
 
@@ -15,16 +15,22 @@ int main(int argc, char* argv[]){
     char *nameArqGeo = NULL;
     char *nameArqQry = NULL;
     char *nameArqPm = NULL;
-
+    City city = NULL;
 
     readArg(argc, argv, &pathOut, &pathIn, &nameArqGeo, &nameArqQry, &nameArqPm);
 
-    // readGeo(pathIn, nameArqGeo, treeRect, treeCircle);
+    readGeo(pathIn, nameArqGeo, &city);
 
-    // writeSvg(treeRect, treeCircle, NULL, NULL, NULL, NULL, pathOut, nameArqGeo);
+    writeSvg(pathOut, nameArqGeo, city);
 
     // readQry(pathIn, pathOut, nameArqQry, nameArqGeo, treeRect, treeCircle);
 
+
+    int test = blockDeleteAll(getCityTree(city), getCityHashTable(city));\
+
+    // printf("%d", test);
+    
+    cityEnd(city);
 
     if(pathOut){
         free(pathOut);

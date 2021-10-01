@@ -64,6 +64,7 @@ void blockDeleteAllTree(Node root){
 
     for(NodeL* nodeAux = getListFirst(list); nodeAux; nodeAux = getListNext(nodeAux)){
         Info block = getListInfo(nodeAux);
+        // printf("%s\n", getBlockCep(block));
         blockDelete(block);
     }
     endList(list);
