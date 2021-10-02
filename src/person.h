@@ -1,9 +1,11 @@
 #ifndef __PERSON_H
 #define __PERSON_H
 
-#include "hashtable.h"
-
 typedef void* Person;
+
+#include "hashtable.h"
+#include "leasing.h"
+
 
 /*
 Função: Cria e retorna uma estrutura de pessoa;
@@ -75,5 +77,12 @@ Pré: Um void* com o endereço da pessoa;
 Pós: Retorna um int com o ano.
 */
 int getPersonYear(Person person);
+
+/*
+Função: Substitui a locação da pessoa por outra;
+Pré: Um void* com o endereço da pessoa, um void* com o endereço da locação;
+Pós: Retorna 1 se sucesso ou 0 para falha.
+*/
+int setPeopleLeasing(Person person, Leasing leasing);
 
 #endif

@@ -11,6 +11,8 @@ typedef struct personStruct{
     char gender;
     int day, month, year;
 
+    Leasing leasing;
+
 }PersonStruct;
 
 // Cria e retorna uma estrutura de pessoa
@@ -24,6 +26,8 @@ Person personCreate(char* name, char* surname, char* cpf, char gender, int day, 
     strcpy(new->cpf, cpf);
     strcpy(new->name, name);
     strcpy(new->surname, surname);
+
+    new->leasing = NULL;
 
     return new;
 }
@@ -112,4 +116,16 @@ int getPersonYear(Person person){
     PersonStruct* personAux = (PersonStruct* ) person;
 
     return personAux->year;
+}
+
+// Substitui a locação da pessoa
+int setPeopleLeasing(Person person, Leasing leasing){
+    PersonStruct* personAux = (PersonStruct* ) person;
+
+    if(leasing == NULL || person == NULL){
+        return 0;
+    }
+
+    personAux->leasing = leasing;
+    return 1;
 }
