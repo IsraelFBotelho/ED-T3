@@ -37,7 +37,7 @@ int cityEnd(City city){
 }
 
 // Insere nas estruturas da cidade um elemento
-int cityInsert(City city, Info info, double keyY, double keyX, char* keyHash){
+int cityInsert(City city, Info info, double keyX, double keyY, char* keyHash){
     CityStruct* cityAux = (CityStruct* ) city;
 
     if(cityAux == NULL){

@@ -145,6 +145,7 @@ Info hashTableSearch(HashTable table, char key[50]){
     return NULL;
 }
 
+// Gera e retorna uma tabela com todos os void* fora de seus respectivos itens
 List getHashTableList(HashTable table, int index){
     HashTableStruct* tableAux = (HashTableStruct* ) table;
 
@@ -156,8 +157,10 @@ List getHashTableList(HashTable table, int index){
         return NULL;
     }
 
+    // Gera uma lista nova que retorna
     List list = createList();
 
+    // Preenche a nova lista
     for(NodeL nodeAux = getListFirst(tableAux->nodes[index].list); nodeAux; nodeAux = getListNext(nodeAux)){
         Item* item = (Item*) getListInfo(nodeAux);
 
@@ -167,6 +170,7 @@ List getHashTableList(HashTable table, int index){
     return list;
 }
 
+// Retorna o tamanho da tabela de espalhamento
 int getHashTableSize(HashTable table){
     HashTableStruct* tableAux = (HashTableStruct* ) table;
 
