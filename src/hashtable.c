@@ -136,7 +136,7 @@ Info hashTableSearch(HashTable table, char key[50]){
     for(NodeL nodeAux = getListFirst(tableAux->nodes[index].list); nodeAux; nodeAux = getListNext(nodeAux)){
         Item* item = (Item*) getListInfo(nodeAux);
 
-        if(strcmp(key, item->key) == 1){
+        if(strcmp(key, item->key) == 0){
             return item->info;
             break;
         }

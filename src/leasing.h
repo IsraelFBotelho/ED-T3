@@ -1,6 +1,7 @@
 #ifndef __LEASING_H
 #define __LEASING_H
 
+
 #include "block.h"
 #include "city.h"
 #include "person.h"

@@ -11,7 +11,7 @@ typedef struct personStruct{
     char gender;
     int day, month, year;
 
-    Leasing leasing;
+    Block block;
 
 }PersonStruct;
 
@@ -27,7 +27,7 @@ Person personCreate(char* name, char* surname, char* cpf, char gender, int day, 
     strcpy(new->name, name);
     strcpy(new->surname, surname);
 
-    new->leasing = NULL;
+    new->block = NULL;
 
     return new;
 }
@@ -64,6 +64,7 @@ int personDeleteAll(HashTable table){
                 free(personAux);
             }
         }
+        endList(list);
     }
 
     return 1;
@@ -119,13 +120,13 @@ int getPersonYear(Person person){
 }
 
 // Substitui a locação da pessoa
-int setPeopleLeasing(Person person, Leasing leasing){
+int setPeopleHomeBlock(Person person, Block block){
     PersonStruct* personAux = (PersonStruct* ) person;
 
-    if(leasing == NULL || person == NULL){
+    if(block == NULL || person == NULL){
         return 0;
     }
 
-    personAux->leasing = leasing;
+    personAux->block = block;
     return 1;
 }

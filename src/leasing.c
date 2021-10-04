@@ -68,6 +68,7 @@ int leasingDeleteAll(HashTable table){
                 free(leasingAux);
             }
         }
+        endList(list);
     }
 
     return 1;
@@ -119,7 +120,7 @@ int setLeasingResident(Leasing leasing, Person person){
     leasingAux->resident = person;
 
     if(person != NULL){
-        setPeopleLeasing(person, leasing);
+        setPeopleHomeBlock(person, leasingAux->block);
     }
 
     return 1;

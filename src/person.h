@@ -83,6 +83,6 @@ Função: Substitui a locação da pessoa por outra;
 Pré: Um void* com o endereço da pessoa, um void* com o endereço da locação;
 Pós: Retorna 1 se sucesso ou 0 para falha.
 */
-int setPeopleLeasing(Person person, Leasing leasing);
+int setPeopleHomeBlock(Person person, Block block);
 
 #endif
