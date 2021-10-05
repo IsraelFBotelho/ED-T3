@@ -72,4 +72,8 @@ Pós: Retorna void* com a info se existir ou NULL caso não encontre.
 */
 List getTreeNodeItens(Node root);
 
+Info getTreeListItem(Info item);
+
+double getTreeListKeyY(Info item);
+
 #endif

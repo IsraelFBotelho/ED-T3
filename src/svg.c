@@ -46,7 +46,7 @@ void recursiveDrawBlock(FILE *svg, Tree root){
     List list = getTreeNodeItens(root);
 
     for(NodeL nodeAux = getListFirst(list); nodeAux; nodeAux = getListNext(nodeAux)){
-        Block block = getListInfo(nodeAux);
+        Block block = getTreeListItem(getListInfo(nodeAux));
 
         double x, y, height, width;
         char *cep, *fill, *stroke;
@@ -70,7 +70,6 @@ void recursiveDrawBlock(FILE *svg, Tree root){
         fprintf(svg, "\t<rect id=\"%s\" x=\"%lf\" y=\"%lf\" width=\"%lf\" height=\"%lf\" stroke=\"%s\" fill=\"%s\" fill-opacity=\"50%%\" />\n", cep, x, y, width, height, stroke, fill);
     }
 
-    endList(list);
     recursiveDrawBlock(svg, getTreeRight(root));
 }
 

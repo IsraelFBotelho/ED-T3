@@ -59,12 +59,12 @@ int personDeleteAll(HashTable table){
 
         // Segundo for acessa pessoa a pessoa da lista
         for(NodeL nodeAux = getListFirst(list); nodeAux; nodeAux = getListNext(nodeAux)){
-            PersonStruct* personAux = (PersonStruct* ) getListInfo(nodeAux);
+            PersonStruct* personAux = (PersonStruct* ) getHashTableListItem(getListInfo(nodeAux));
             if(personAux != NULL){
                 free(personAux);
             }
         }
-        endList(list);
+
     }
 
     return 1;

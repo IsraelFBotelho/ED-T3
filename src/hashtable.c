@@ -157,17 +157,7 @@ List getHashTableList(HashTable table, int index){
         return NULL;
     }
 
-    // Gera uma lista nova que retorna
-    List list = createList();
-
-    // Preenche a nova lista
-    for(NodeL nodeAux = getListFirst(tableAux->nodes[index].list); nodeAux; nodeAux = getListNext(nodeAux)){
-        Item* item = (Item*) getListInfo(nodeAux);
-
-        insertListElement(list, item->info);
-    }
-    
-    return list;
+    return tableAux->nodes[index].list;
 }
 
 // Retorna o tamanho da tabela de espalhamento
@@ -175,4 +165,16 @@ int getHashTableSize(HashTable table){
     HashTableStruct* tableAux = (HashTableStruct* ) table;
 
     return tableAux->size; 
+}
+
+Info getHashTableListItem(Info item){
+    Item* itemAux = (Item* ) item;
+
+    return itemAux->info;
+}
+
+char* getHashTableListKey(Info item){
+    Item* itemAux = (Item* ) item;
+
+    return itemAux->key;
 }

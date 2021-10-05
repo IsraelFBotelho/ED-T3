@@ -63,11 +63,10 @@ void blockDeleteAllTree(Node root){
     }
 
     for(NodeL* nodeAux = getListFirst(list); nodeAux; nodeAux = getListNext(nodeAux)){
-        Info block = getListInfo(nodeAux);
-        // printf("%s\n", getBlockCep(block));
+        Info block = getTreeListItem(getListInfo(nodeAux));
+        
         blockDelete(block);
     }
-    endList(list);
 }
 
 // Percorre uma estrutura de tabela de espalhamento e vai deletando todas as quadras das listas
@@ -76,10 +75,9 @@ void blockDeleteAllHashTable(HashTable table){
         List list = getHashTableList(table, i);
 
         for(NodeL* nodeAux = getListFirst(list); nodeAux; nodeAux = getListNext(nodeAux)){
-            Info block = getListInfo(nodeAux);
+            Info block = getHashTableListItem(getListInfo(nodeAux));
             blockDelete(block);
         }
-        endList(list);
     }
 
 }

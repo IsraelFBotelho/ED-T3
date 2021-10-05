@@ -54,4 +54,8 @@ Pós: Retorna um int com o tamanho.
 */
 int getHashTableSize(HashTable table);
 
+Info getHashTableListItem(Info item);
+
+char* getHashTableListKey(Info item);
+
 #endif

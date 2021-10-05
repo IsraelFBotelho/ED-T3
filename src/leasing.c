@@ -63,12 +63,11 @@ int leasingDeleteAll(HashTable table){
 
         // Segundo for acessa pessoa a pessoa da lista
         for(NodeL nodeAux = getListFirst(list); nodeAux; nodeAux = getListNext(nodeAux)){
-            LeasingStruct* leasingAux = (LeasingStruct* ) getListInfo(nodeAux);
+            LeasingStruct* leasingAux = (LeasingStruct* ) getHashTableListItem(getListInfo(nodeAux));
             if(leasingAux != NULL){
                 free(leasingAux);
             }
         }
-        endList(list);
     }
 
     return 1;

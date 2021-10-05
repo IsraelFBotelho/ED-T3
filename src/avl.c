@@ -432,12 +432,17 @@ List getTreeNodeItens(Node root){
         return NULL;
     }
 
-    List list = createList();
-    for(NodeL nodeAux = getListFirst(rootAux->list); nodeAux; nodeAux = getListNext(nodeAux)){
-        Item* item = getListInfo(nodeAux);
+    return rootAux->list;
+}
 
-        insertListElement(list, item->info);
-    }
+Info getTreeListItem(Info item){
+    Item* itemAux = (Item* ) item;
 
-    return list;
+    return itemAux->info;
+}
+
+double getTreeListKeyY(Info item){
+    Item* itemAux = (Item* ) item;
+
+    return itemAux->keyY;
 }
