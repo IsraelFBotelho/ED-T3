@@ -121,12 +121,56 @@ void commandDMQMark(FILE* txt, FILE* svg, HashTable residentTable, HashTable lea
     
     char rent[10];
     if(isResidentRent(resident) == 1){
-        strcpy(rent,"Sim");
+        strcpy(rent, "Sim");
     }else{
         strcpy(rent, "Não");
     }
 
     fprintf(txt, "Morador: Nome: %s, Sobrenome: %s, Sexo: %c, Data de Nascimento: %d/%d/%d, Cpf: %s, Endereço: Cep: %s, Face: %c, Numero: %d, Complemento: %s, É alugada? %s\n", getPersonName(person), getPersonSurname(person), getPersonGender(person), getPersonDay(person), getPersonMonth(person), getPersonYear(person), getResidentCpf(resident), getResidentCep(resident), getResidentSide(resident), getResidentNumber(resident), getResidentComplement(resident), rent);
+}
+
+void commandMud(FILE* txt, FILE* svg, City city, HashTable residentTable, HashTable leasingTable, char* cpf, char* cep, char side, int num, char* complement){
+    Resident resident = hashTableSearch(residentTable, cpf);
+    if(resident == NULL){
+        fprintf(txt, "Erro: Morador não encontrado");
+    }
+    char key[50];
+    sprintf(key, "%s/%c/%d", getResidentCep(resident), getResidentSide(resident), getResidentNumber(resident));
+    Leasing leasing = hashTableSearch(leasingTable, key);
+
+    double x1 = getLeasingX(leasing);
+    double y1 = getLeasingY(leasing);
+
+    Person person = getResidentPerson(resident);
+
+    fprintf(txt, "Morador: Nome: %s, Sobrenome: %s, Sexo: %c, Data de Nascimento: %d/%d/%d, Antigo Endereço: Cep: %s, Face: %c, Numero: %d, Complemento: %s ", getPersonName(person), getPersonSurname(person), getPersonGender(person), getPersonDay(person), getPersonMonth(person), getPersonYear(person), getResidentCep(resident), getResidentSide(resident), getResidentNumber(resident), getResidentComplement(resident));
+
+    residentDelete(resident);
+    hashTableRemove(residentTable, cpf);
+
+    resident = residentCreate(cpf, cep, side, num, complement, person, 0);
+
+    fprintf(txt, "Novo Endereço: Cep: %s, Face: %c, Numero: %d, Complemento: %s\n", cep, side, num, complement);
+
+    sprintf(key, "%s/%c/%d", cep, side, num);
+    leasing = hashTableSearch(leasingTable, key);
+
+    if(leasing != NULL){
+        setLeasingResident(leasing, resident);
+        hashTableInsert(residentTable, cpf, resident);
+    }else{
+        leasing = leasingCreate(getCityHashTable(city), cep, side, num, complement);
+        hashTableInsert(leasingTable, key, leasing);
+        hashTableInsert(residentTable, cpf, resident);
+        setLeasingResident(leasing, resident);
+    }
+    
+    double x2 = getLeasingX(leasing);
+    double y2 = getLeasingY(leasing);
+
+    fprintf(svg, "\t<line x1=\"%lf\" y1=\"%lf\" x2=\"%lf\" y2=\"%lf\" style=\"stroke:rgb(255,0,0);stroke-width:2\" />\n", x1, y1, x2, y2);
+    fprintf(svg, "\t<circle  cx=\"%lf\" cy=\"%lf\" r=\"5\" stroke=\"white\" stroke-width=\"5\" fill=\"red\"/>\n", x1, y1);
+    fprintf(svg, "\t<circle  cx=\"%lf\" cy=\"%lf\" r=\"5\" stroke=\"white\" stroke-width=\"5\" fill=\"blue\"/>\n", x2, y2);
 }
 
 int readQry(char *pathIn, char* pathOut ,char *nameQry, char *nameGeo, City city, HashTable personTable, HashTable leasingTable, HashTable residentTable){
@@ -182,9 +226,10 @@ int readQry(char *pathIn, char* pathOut ,char *nameQry, char *nameGeo, City city
             fprintf(txt, "dm?\n");
             commandDMQMark(txt, svg, residentTable, leasingTable, cpf);
 
-        }else if(strcmp(command, "im") == 0){
-            fscanf(qry, "%lf %lf\n", &x, &y);
-            fprintf(txt, "im\n");
+        }else if(strcmp(command, "mud") == 0){
+            fscanf(qry, "%s %s %c %d %s\n", cpf, cep, &side, &num, compl);
+            fprintf(txt, "mud\n");
+            commandMud(txt, svg, city, residentTable, leasingTable, cpf, cep, side, num, compl);
 
 
         }else if(strcmp(command, "t30") == 0){
