@@ -5,7 +5,7 @@
 #include "arg.h"
 #include "svg.h"
 #include "pm.h"
-// #include "qry.h"
+#include "qry.h"
 #include "city.h"
 #include "block.h"
 #include "leasing.h"
@@ -26,11 +26,11 @@ int main(int argc, char* argv[]){
 
     readGeo(pathIn, nameArqGeo, &city);
 
-    writeSvg(pathOut, nameArqGeo, city);
+    writeGeoSvg(pathOut, nameArqGeo, city);
 
     readPm(pathIn, nameArqPm, city, &personTable, &leasingTable);
 
-    // readQry(pathIn, pathOut, nameArqQry, nameArqGeo, treeRect, treeCircle);
+    readQry(pathIn, pathOut, nameArqQry, nameArqGeo, city, personTable, leasingTable);
 
 
     blockDeleteAll(getCityTree(city), getCityHashTable(city));

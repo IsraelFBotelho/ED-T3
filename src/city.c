@@ -52,6 +52,25 @@ int cityInsert(City city, Info info, double keyX, double keyY, char* keyHash){
     return tree == 0 || table == 0 ? 0 : 1;
 }
 
+int cityRemovebyCep(City city, char* cep){
+    CityStruct* cityAux = (CityStruct* ) city;
+
+    if(cityAux == NULL){
+        return 0;
+    }
+
+    Block block = hashTableSearch(cityAux->table, cep);
+    printf("%d\n", block == NULL);
+    double x = getBlockX(block);
+    double y = getBlockY(block);
+
+    int tree = treeRemove(cityAux->tree, x, y);
+    int table = hashTableRemove(cityAux->table, cep);
+
+    blockDelete(block);
+    return tree == 0 || table == 0 ? 0 : 1;
+}
+
 // Recupera a árvore da cidade
 Tree getCityTree(City city){
     CityStruct* cityAux = (CityStruct* ) city;

@@ -240,6 +240,9 @@ int treeInsert(Tree tree, Info info, double keyX, double keyY){
 // Busca o menor nó
 NodeStruct* searchLesser(NodeStruct* this){
     NodeStruct* node1 = this;
+    if(node1 == NULL){
+        return NULL;
+    }
     NodeStruct* node2 = this->left;
 
     while(node2 != NULL){
@@ -253,7 +256,11 @@ NodeStruct* searchLesser(NodeStruct* this){
 // Busca o maior nó
 NodeStruct* searchBigger(NodeStruct* this){
     NodeStruct* node1 = this;
+    if(node1 == NULL){
+        return NULL;
+    }
     NodeStruct* node2 = this->right;
+
 
     while(node2 != NULL){
         node1 = node2;
@@ -269,6 +276,8 @@ int recTreeRemove(NodeStruct** root, double keyX, double keyY){
     if(*root == NULL){
         return 0;
     }
+
+    printf("%lf %lf\n", keyX, keyY);
 
     // Se for menor que o nó atual vai para a esquerda e balanceia se precisar
     if(keyX < (*root)->key){
@@ -301,13 +310,14 @@ int recTreeRemove(NodeStruct** root, double keyX, double keyY){
             Item* item = (Item* ) getListInfo(nodeAux);
             if(keyY == item->keyY){
                 removeListNode((*root)->list, nodeAux);
-                break;
+                free(item);
+                return 1;
             }
         }
     }
 
     // Se for igual ao valor do nó o remove e balanceia se precisar
-    if(keyX == (*root)->key && getListSize((*root)->list) == 0){
+    if((keyX == (*root)->key && getListSize((*root)->list) == 0) || (keyX == (*root)->key && keyY == FLAG_STOP_REMOVE)){
             if((*root)->left == NULL || (*root)->right == NULL){
                 NodeStruct* oldNode = (*root);
                 if((*root)->left != NULL){
@@ -315,16 +325,19 @@ int recTreeRemove(NodeStruct** root, double keyX, double keyY){
                 }else{
                     (*root) = (*root)->right;
                 }
-
-                Item* item = (Item* ) getListInfo(oldNode->list);
-                free(item);
-
-                endList(oldNode->list);
             
                 free(oldNode);
             }else{
                 NodeStruct* temp = searchLesser((*root)->right);
+
+                endList((*root)->list);
                 (*root)->list = temp->list;
+                (*root)->key = temp->key;
+                NodeStruct* big = searchBigger((*root)->right);
+                NodeStruct* small = searchLesser((*root)->left);
+                (*root)->biggerX = big != NULL? big->key : (*root)->key;
+                (*root)->lesserX = small != NULL? small->key : (*root)->key;
+
                 recTreeRemove(&(*root)->right, (*root)->key, FLAG_STOP_REMOVE);
                 if(nodeFactor(*root) >= 2){
                     if(nodeHeight((*root)->left->right) <= nodeHeight((*root)->left->left)){
@@ -340,8 +353,8 @@ int recTreeRemove(NodeStruct** root, double keyX, double keyY){
     // Caso remova o nó troca os maiores e menores
     NodeStruct* big = searchBigger((*root)->right);
     NodeStruct* small = searchLesser((*root)->left);
-    (*root)->biggerX = big->key;
-    (*root)->lesserX = small->key;
+    (*root)->biggerX = big != NULL? big->key : (*root)->key;
+    (*root)->lesserX = small != NULL? small->key : (*root)->key;
 
 
     return res;

@@ -46,7 +46,7 @@ void readPm(char* path, char* name, City city, HashTable* personTable, HashTable
 
         if(strcmp(command, "p") == 0){
             fscanf(pm, "%s %s %s %c %d/%d/%d \n", cpf, personName, surname, &gender, &day, &month, &year);
-            Person person = personCreate(name, surname, cpf, gender, day, month, year);
+            Person person = personCreate(personName, surname, cpf, gender, day, month, year);
             hashTableInsert((*personTable), cpf, person);
             // printf("%d %d %d \n", day, month, year);
 
@@ -59,9 +59,9 @@ void readPm(char* path, char* name, City city, HashTable* personTable, HashTable
                 if(person != NULL){
                     char key[100];
                     sprintf(key, "%s/%c/%d", cep, side, number);
-                    int i =hashTableInsert(*leasingTable, key, leasing);
+                    hashTableInsert(*leasingTable, key, leasing);
                     setLeasingResident(leasing, person);
-                    printf("%d\n",i);
+
                 }else{
                     leasingDelete(leasing);
                 }

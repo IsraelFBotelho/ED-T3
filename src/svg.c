@@ -86,7 +86,7 @@ void drawBlocks(FILE *svg, Tree tree){
 }
 
 // Escreve o SVG e tudo que precisa nele
-void writeSvg(char *pathOut, char *nameArq, City city){
+void writeGeoSvg(char *pathOut, char *nameArq, City city){
     char s[] = "svg";
     char* nameSvg = s;
     char* nameArqExtr = (char* ) extractName(nameArq);
