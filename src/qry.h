@@ -3,6 +3,5 @@
 
 #include "city.h"
 
-int readQry(char *pathIn,char* pathOut ,char *nameQry, char *nameGeo, City city, HashTable personTable, HashTable leasingTable);
-
+int readQry(char *pathIn, char* pathOut ,char *nameQry, char *nameGeo, City city, HashTable personTable, HashTable leasingTable, HashTable residentTable);
 #endif

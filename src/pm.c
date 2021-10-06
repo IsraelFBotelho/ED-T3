@@ -6,8 +6,9 @@
 #include "city.h"
 #include "person.h"
 #include "leasing.h"
+#include "resident.h"
 
-void readPm(char* path, char* name, City city, HashTable* personTable, HashTable* leasingTable){
+void readPm(char* path, char* name, City city, HashTable* personTable, HashTable* leasingTable, HashTable* residentTable){
 
     if(name == NULL){
         return;
@@ -39,6 +40,7 @@ void readPm(char* path, char* name, City city, HashTable* personTable, HashTable
     // printf("Arquivo: %s\nCaminho: %s\n", name, path);
     *personTable = hashTableCreate(n);
     *leasingTable = hashTableCreate(n);
+    *residentTable = hashTableCreate(n);
 
     while(!feof(pm)){
 
@@ -60,7 +62,9 @@ void readPm(char* path, char* name, City city, HashTable* personTable, HashTable
                     char key[100];
                     sprintf(key, "%s/%c/%d", cep, side, number);
                     hashTableInsert(*leasingTable, key, leasing);
-                    setLeasingResident(leasing, person);
+                    Resident resident = residentCreate(cpf, cep, side, number, complement, person, 0);
+                    hashTableInsert(*residentTable, cpf, resident);
+                    setLeasingResident(leasing, resident);
 
                 }else{
                     leasingDelete(leasing);

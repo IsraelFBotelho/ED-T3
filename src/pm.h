@@ -6,6 +6,6 @@
 
 /*
 */
-void readPm(char* path, char* name, City city, HashTable* personTable, HashTable* leasingTable);
+void readPm(char* path, char* name, City city, HashTable* personTable, HashTable* leasingTable, HashTable* residentTable);
 
 #endif

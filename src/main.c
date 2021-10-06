@@ -10,6 +10,7 @@
 #include "block.h"
 #include "leasing.h"
 #include "person.h"
+#include "resident.h"
 
 int main(int argc, char* argv[]){
 
@@ -21,6 +22,7 @@ int main(int argc, char* argv[]){
     City city = NULL;
     HashTable personTable = NULL;
     HashTable leasingTable = NULL;
+    HashTable residentTable = NULL;
 
     readArg(argc, argv, &pathOut, &pathIn, &nameArqGeo, &nameArqQry, &nameArqPm);
 
@@ -28,9 +30,9 @@ int main(int argc, char* argv[]){
 
     writeGeoSvg(pathOut, nameArqGeo, city);
 
-    readPm(pathIn, nameArqPm, city, &personTable, &leasingTable);
+    readPm(pathIn, nameArqPm, city, &personTable, &leasingTable, &residentTable);
 
-    readQry(pathIn, pathOut, nameArqQry, nameArqGeo, city, personTable, leasingTable);
+    readQry(pathIn, pathOut, nameArqQry, nameArqGeo, city, personTable, leasingTable, residentTable);
 
 
     blockDeleteAll(getCityTree(city), getCityHashTable(city));
@@ -39,10 +41,13 @@ int main(int argc, char* argv[]){
 
     personDeleteAll(personTable);
 
+    residentDeleteAll(residentTable);
+
     // printf("%d", test);
 
     hashTableEnd(personTable);
     hashTableEnd(leasingTable);
+    hashTableEnd(residentTable);
     
     cityEnd(city);
 

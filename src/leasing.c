@@ -10,8 +10,11 @@ typedef struct leasingStruct{
     int num;
     char complement[50];
 
-    Person resident;
+    Resident resident;
     Block block;
+
+    double x;
+    double y;
 
 }LeasingStruct;
 
@@ -32,6 +35,21 @@ Leasing leasingCreate(HashTable table, char* cep, char side, int num, char* comp
         free(new);
         return NULL;
     }
+
+    if(side == 'S'){
+        new->y = getBlockY(new->block);
+        new->x = getBlockX(new->block) + num;
+    }else if(side == 'N'){
+        new->x = getBlockX(new->block) + num;
+        new->y = getBlockY(new->block) + getBlockHeight(new->block);
+    }else if(side == 'L'){
+        new->x = getBlockX(new->block);
+        new->y = getBlockY(new->block) + num;
+    }else{
+        new->x = getBlockX(new->block) + getBlockWidth(new->block);
+        new->y = getBlockY(new->block) + num;
+    }
+
 
     return new;
 }
@@ -102,25 +120,32 @@ char* getLeasingComplement(Leasing leasing){
 }
 
 // Retorna o morador da locação
-Person getLeasingResident(Leasing leasing){
+Resident getLeasingResident(Leasing leasing){
     LeasingStruct* leasingAux = (LeasingStruct* ) leasing;
 
     return leasingAux->resident;
 }
 
 // Substitui o morador da locação
-int setLeasingResident(Leasing leasing, Person person){
+int setLeasingResident(Leasing leasing, Resident resident){
     LeasingStruct* leasingAux = (LeasingStruct* ) leasing;
 
     if(leasingAux == NULL){
         return 0;
     }
 
-    leasingAux->resident = person;
-
-    if(person != NULL){
-        setPeopleHomeBlock(person, leasingAux->block);
-    }
-
+    leasingAux->resident = resident;
     return 1;
+}
+
+double getLeasingX(Leasing leasing){
+    LeasingStruct* leasingAux = (LeasingStruct* ) leasing;
+
+    return leasingAux->x;
+}
+
+double getLeasingY(Leasing leasing){
+    LeasingStruct* leasingAux = (LeasingStruct* ) leasing;
+
+    return leasingAux->y;
 }

@@ -4,7 +4,7 @@
 
 #include "block.h"
 #include "city.h"
-#include "person.h"
+#include "resident.h"
 
 typedef void* Leasing;
 
@@ -62,13 +62,17 @@ Função: Retorna o morador de uma locação;
 Pré: Um void* de uma locação;
 Pós: Retorna um void* com o morador.
 */
-Person getLeasingResident(Leasing leasing);
+Resident getLeasingResident(Leasing leasing);
 
 /*
 Função: Substitui o morador de uma locação;
-Pré: Um void* de uma locação, um void* de uma pessoa;
+Pré: Um void* de uma locação, um void* de um morador;
 Pós: Retorna 1 se sucesso ou 0 para falha.
 */
-int setLeasingResident(Leasing leasing, Person person);
+int setLeasingResident(Leasing leasing, Resident resident);
+
+double getLeasingX(Leasing leasing);
+
+double getLeasingY(Leasing leasing);
 
 #endif
