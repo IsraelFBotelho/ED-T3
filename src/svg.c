@@ -67,7 +67,7 @@ void recursiveDrawBlock(FILE *svg, Tree root){
             fill = "none";
         }
         
-        fprintf(svg, "\t<rect id=\"%s\" x=\"%lf\" y=\"%lf\" width=\"%lf\" height=\"%lf\" stroke=\"%s\" fill=\"%s\" fill-opacity=\"50%%\" />\n", cep, x, y, width, height, stroke, fill);
+        fprintf(svg, "\t<rect id=\"%s\" x=\"%lf\" y=\"%lf\" width=\"%lf\" height=\"%lf\" stroke=\"%s\" fill=\"%s\" fill-opacity=\"0.5\" stroke-opacity=\"0.5\" />\n", cep, x, y, width, height, stroke, fill);
     }
 
     recursiveDrawBlock(svg, getTreeRight(root));

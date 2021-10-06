@@ -50,7 +50,7 @@ void readGeo(char* path, char* name, City* city){
         
         // Comando "cq" 
         }else if(strcmp(command, "cq") == 0){
-            fscanf(geo, "%lf %s %s\n", &strokeThickness, fill, stroke);
+            fscanf(geo, "%lf %s %s %s\n", &strokeThickness, fill, fill, stroke);
         }
     }
     free(fullPathGeo);
