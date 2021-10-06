@@ -85,4 +85,6 @@ Pós: Retorna 1 se sucesso ou 0 para falha.
 */
 int setPeopleHomeBlock(Person person, Block block);
 
+Block getPersonHomeBlock(Person person);
+
 #endif

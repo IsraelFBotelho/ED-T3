@@ -56,7 +56,7 @@ void commandDel(FILE* txt, FILE* svg, City city, HashTable leasingTable, char* c
                 fprintf(txt, "Locação: Cep: %s, Face: %c, Numero: %d, Complemento: %s\n",getLeasingCep(leasing), getLeasingSide(leasing), getLeasingNum(leasing), getLeasingComplement(leasing));
                 char key[50];
                 sprintf(key, "%s/%c/%d\0", getLeasingCep(leasing), getLeasingSide(leasing), getLeasingNum(leasing));
-                // printf("%s\n",key);
+                printf("%s\n",key);
 
                 Person person = getLeasingResident(leasing);
                 fprintf(txt, "Morador: Cpf: %s, Nome: %s, Sobrenome: %s, Sexo: %c, Nascimento: %d/%d/%d\n", getPersonCpf(person), getPersonName(person), getPersonSurname(person), getPersonGender(person), getPersonDay(person), getPersonMonth(person), getPersonYear(person));
@@ -71,12 +71,29 @@ void commandDel(FILE* txt, FILE* svg, City city, HashTable leasingTable, char* c
     }
     double x, y;
     Block block = hashTableSearch(getCityHashTable(city), cep);
-    x = getBlockX(block) + (getBlockWidth(block)/2);
+    x = getBlockX(block) + (getBlockWidth(block) / 2);
     y = getBlockY(block) + (getBlockHeight(block) / 2);
     fprintf(svg, "\t<line x1=\"%lf\" y1=\"%lf\" x2=\"%lf\" y2=\"0\" style=\"stroke:rgb(255,0,0);stroke-width:2\"/>\n",x, y, x);
     fprintf(svg, "\t<text x=\"%lf\" y=\"0\"> %s </text>\n", x, y, cep);
     fprintf(txt, "Quadra: Cep: %s\n", cep);
     cityRemovebyCep(city, cep);
+}
+
+void commandMQMark(FILE* txt, HashTable personTable, char* cep){
+    for(int i = 0; i < getHashTableSize(personTable); i++){
+        List list = getHashTableList(personTable, i);
+
+        for(NodeL nodeAux = getListFirst(list); nodeAux; nodeAux = getListNext(nodeAux)){
+            Person person = getHashTableListItem(getListInfo(nodeAux));
+            if(getPersonHomeBlock(person) != NULL){
+                if(strcmp(getBlockCep(getPersonHomeBlock(person)), cep) == 0){
+                    fprintf(txt, "Morador: ");
+                }
+            }
+        }
+    }
+
+
 }
 
 int readQry(char *pathIn, char* pathOut ,char *nameQry, char *nameGeo, City city, HashTable personTable, HashTable leasingTable){
@@ -122,10 +139,9 @@ int readQry(char *pathIn, char* pathOut ,char *nameQry, char *nameGeo, City city
             fprintf(txt,"del\n");
             commandDel(txt , svg, city, leasingTable, cep);
 
-
-        }else if(strcmp(command, "dr") == 0){
+        }else if(strcmp(command, "m?") == 0){
             fscanf(qry, "%s\n", id);
-            fprintf(txt, "dr\n");
+            fprintf(txt, "m?\n");
 
 
         }else if(strcmp(command, "fg") == 0){

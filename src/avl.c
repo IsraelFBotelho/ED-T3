@@ -441,7 +441,7 @@ List getTreeNodeItens(Node root){
     if(rootAux == NULL){
         return NULL;
     }
-    if(rootAux->list == NULL || getListSize(rootAux->list) == 0){
+    if(rootAux->list == NULL){
         return NULL;
     }
 

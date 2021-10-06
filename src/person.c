@@ -130,3 +130,9 @@ int setPeopleHomeBlock(Person person, Block block){
     personAux->block = block;
     return 1;
 }
+
+Block getPersonHomeBlock(Person person){
+    PersonStruct* personAux = (PersonStruct* ) person;
+
+    return personAux->block;
+}
