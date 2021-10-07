@@ -191,7 +191,7 @@ void commandOlocQMark(FILE* txt, FILE* svg, HashTable saleTable, double x, doubl
             if(xAux >= x && xAux <= (x+w)){
                 if(yAux >= y && yAux <= (y+h)){
                     if(isSaleLeasing(sale) == 0){
-                        fprintf(svg, "\t<text x=\"%lf\" y=\"%lf\">*</text>",xAux, yAux);
+                        fprintf(svg, "\t<text x=\"%lf\" y=\"%lf\">*</text>\n",xAux, yAux);
                         fprintf(txt, "Locação: Id: %s, Cep: %s, Face: %c, Numero: %d, Complemento: %s, Área: %lfm², Preço: %.2lf mensais\n", getSaleId(sale), getSaleCep(sale), getSaleSide(sale), getSaleNumber(sale), getSaleComplement(sale), getSaleAr(sale), getSaleV(sale));
                     }
                 }
@@ -252,6 +252,41 @@ void commandLoc(FILE* txt, FILE* svg, City city, HashTable personTable, HashTabl
         }
     }
 
+}
+
+void commandLocQMark(FILE* txt, FILE* svg, HashTable saleTable, HashTable leasingTable, char* id){
+    Sale sale = hashTableSearch(saleTable, id);
+
+    char saleStatus;
+
+    if(isSaleLeasing(sale) == 0){
+        saleStatus = '$';
+
+    }else if(isSaleLeasing(sale) == 1){
+        saleStatus = '*';
+
+    }else{
+        saleStatus = '#';
+
+    }
+
+    double x = getSaleX(sale);
+    double y = getSaleY(sale);
+
+    fprintf(svg, "\t<text x=\"%lf\" y=\"%lf\">%c</text>\n",x, y, saleStatus);
+
+    fprintf(txt, "Locação: Id: %s, Cep: %s, Face: %c, Numero: %d, Complemento: %s, Área: %lfm², Preço: %.2lf mensais\n", getSaleId(sale), getSaleCep(sale), getSaleSide(sale), getSaleNumber(sale), getSaleComplement(sale), getSaleAr(sale), getSaleV(sale));
+
+    if(isSaleLeasing(sale) == 1){
+        char key[50];
+        sprintf(key, "%s/%c/%d", getSaleCep(sale), getSaleSide(sale), getSaleNumber(sale));
+        Leasing leasing = hashTableSearch(leasingTable, key);
+        Resident resident = getLeasingResident(leasing);
+        Person person = getResidentPerson(resident);
+
+        fprintf(txt, "Pessoa: Cpf:%s, Nome:%s, Sobrenome:%s, Sexo:%c, Nascimento: %d/%d/%d\n", getPersonCpf(person), getPersonName(person), getPersonSurname(person), getPersonGender(person), getPersonDay(person), getPersonMonth(person), getPersonYear(person));
+
+    }
 }
 
 int readQry(char *pathIn, char* pathOut ,char *nameQry, char *nameGeo, City city, HashTable personTable, HashTable leasingTable, HashTable residentTable){
@@ -340,6 +375,42 @@ int readQry(char *pathIn, char* pathOut ,char *nameQry, char *nameGeo, City city
             fscanf(qry, "%s %s\n", id, cpf);
             fprintf(txt, "loc\n");
             commandLoc(txt, svg, city, personTable, leasingTable, residentTable, saleTable, id, cpf);
+
+
+        }else if((strcmp(command, "loc?") == 0)){
+            fscanf(qry, "%s\n", id);
+            fprintf(txt, "loc?\n");
+            commandLocQMark(txt, svg, saleTable, leasingTable, id);
+
+
+        }else if((strcmp(command, "dloc") == 0)){
+            fscanf(qry, "%s %s\n", id, cpf);
+            fprintf(txt, "dloc\n");
+
+
+
+        }else if((strcmp(command, "hom") == 0)){
+            fscanf(qry, "%s %s\n", id, cpf);
+            fprintf(txt, "hom\n");
+
+
+
+        }else if((strcmp(command, "mul") == 0)){
+            fscanf(qry, "%s %s\n", id, cpf);
+            fprintf(txt, "mul\n");
+
+
+
+        }else if((strcmp(command, "dmpt") == 0)){
+            fscanf(qry, "%s %s\n", id, cpf);
+
+
+
+        }else if((strcmp(command, "catac") == 0)){
+            fscanf(qry, "%s %s\n", id, cpf);
+            fprintf(txt, "catac\n");
+
+
 
         }
     }

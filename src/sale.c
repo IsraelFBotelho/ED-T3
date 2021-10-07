@@ -14,6 +14,7 @@ typedef struct saleStruct{
     double ar;
     double v;
 
+    // 0 para oferta disponível / 1 para oferta locada / -1 para oferta encerrada
     int isLeasing;
 
     double x;
