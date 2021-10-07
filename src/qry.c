@@ -43,17 +43,13 @@ char *getQryFileName(char* fullNameGeo, char* nameQry){
     return fullName;
 }
 
-void commandDel(FILE* txt, FILE* svg, City city, HashTable leasingTable, char* cep){
+void commandDel(FILE* txt, FILE* svg, City city, HashTable leasingTable, HashTable residentTable, HashTable saleTable, char* cep){
     for(int i = 0; i < getHashTableSize(leasingTable); i++){
         List list = getHashTableList(leasingTable, i);
 
         for(NodeL nodeAux = getListFirst(list); nodeAux; nodeAux = getListNext(nodeAux)){
             Leasing leasing = getHashTableListItem(getListInfo(nodeAux));
             if(strcmp(getLeasingCep(leasing), cep) == 0){
-
-                if(leasing == NULL){
-                    printf ("1\n");
-                }
 
                 fprintf(txt, "Locação: Cep: %s, Face: %c, Numero: %d, Complemento: %s\n",getLeasingCep(leasing), getLeasingSide(leasing), getLeasingNum(leasing), getLeasingComplement(leasing));
                 char key[50];
@@ -64,6 +60,8 @@ void commandDel(FILE* txt, FILE* svg, City city, HashTable leasingTable, char* c
                 Person person = getResidentPerson(resident);
                 fprintf(txt, "Morador: Cpf: %s, Nome: %s, Sobrenome: %s, Sexo: %c, Nascimento: %d/%d/%d, Endereço: %s, %c, %d, %s\n", getPersonCpf(person), getPersonName(person), getPersonSurname(person), getPersonGender(person), getPersonDay(person), getPersonMonth(person), getPersonYear(person), getResidentCep(resident), getResidentSide(resident), getResidentNumber(resident), getResidentComplement(resident));
 
+                hashTableRemove(residentTable, getResidentCpf(resident));
+                residentDelete(resident);
                 leasingDelete(leasing);
                 hashTableRemove(leasingTable, key);
 
@@ -72,6 +70,26 @@ void commandDel(FILE* txt, FILE* svg, City city, HashTable leasingTable, char* c
             }
         }
     }
+    for(int i = 0; i < getHashTableSize(saleTable); i++){
+        List list = getHashTableList(saleTable, i);
+
+        for(NodeL nodeAux = getListFirst(list); nodeAux; nodeAux = getListNext(nodeAux)){
+            Sale sale = getHashTableListItem(getListInfo(nodeAux));
+
+            if(strcmp(cep, getSaleCep(sale)) == 0){
+                
+                fprintf(txt, "Oferta: Id: %s, Cep: %s, Face: %c, Numero: %d, Complemento: %s, Área: %.2lf, Valor: %.2lf mensais", getSaleId(sale), getSaleCep(sale), getSaleSide(sale), getSaleNumber(sale), getSaleComplement(sale), getSaleAr(sale), getSaleV(sale));
+                
+                hashTableRemove(saleTable, getSaleId(sale));
+                saleDelete(sale);
+
+                break;
+                i--;
+
+            }
+        }
+    }
+
     double x, y;
     Block block = hashTableSearch(getCityHashTable(city), cep);
     x = getBlockX(block) + (getBlockWidth(block) / 2);
@@ -209,6 +227,11 @@ void commandLoc(FILE* txt, FILE* svg, City city, HashTable personTable, HashTabl
         return;
     }
 
+    if(isSaleLeasing(sale) == -1){
+        printf("Comando-Loc: Erro! Oferta encerrada!\n");
+        return;
+    }
+
     Resident auxResident = hashTableSearch(residentTable, cpf);
     if(auxResident != NULL){
         char key[50];
@@ -289,6 +312,101 @@ void commandLocQMark(FILE* txt, FILE* svg, HashTable saleTable, HashTable leasin
     }
 }
 
+void commandDloc(FILE* txt, FILE* svg, HashTable saleTable, HashTable residentTable, HashTable leasingTable, char* id){
+    Sale sale = hashTableSearch(saleTable, id);
+
+    if(isSaleLeasing(sale) == 1){
+        char key[50];
+        sprintf(key, "%s/%c/%d", getSaleCep(sale), getSaleSide(sale), getSaleNumber(sale));
+        Leasing leasing = hashTableSearch(leasingTable, key);
+        Resident resident = getLeasingResident(leasing);
+        Person person = getResidentPerson(resident);
+
+        fprintf(txt, "Locação: Id: %s, Cep: %s, Face: %c, Numero: %d, Complemento: %s, Imóvel: Área: %lfm², Preço: %.2lf mensais, Pessoa: Cpf: %s  Nome: %s, Sobrenome: %s, Sexo: %c, Data de Nascimento: %d/%d/%d\n", getSaleId(sale), getSaleCep(sale), getSaleSide(sale), getSaleNumber(sale), getSaleComplement(sale), getSaleAr(sale), getSaleV(sale), getPersonCpf(person), getPersonName(person), getPersonSurname(person), getPersonGender(person), getPersonDay(person), getPersonMonth(person), getPersonYear(person));
+
+        fprintf(svg,"\t<line x1=\"%lf\" y1=\"%lf\" x2=\"%lf\" y2=\"0\" style=\"stroke:rgb(255,0,0);stroke-width:2\" />\n", getLeasingX(leasing), getLeasingY(leasing), getLeasingX(leasing));
+        fprintf(svg, "\t<text x=\"%lf\" y=\"0\"> Pessoa: Cpf:%s, Nome:%s, Sobrenome:%s, Sexo:%c, Nascimento: %d/%d/%d</text>\n", getLeasingX(leasing), getPersonCpf(person), getPersonName(person), getPersonSurname(person), getPersonGender(person), getPersonDay(person), getPersonMonth(person), getPersonYear(person));
+        fprintf(svg, "\t<text x=\"%lf\" y=\"20\"> Locação: Cep: %s, Face:%c, Numero:%d, Complemento:%s  </text>\n", getLeasingX(leasing), getLeasingCep(leasing), getLeasingSide(leasing), getLeasingNum(leasing), getLeasingComplement(leasing));
+        fprintf(svg, "\t<text x=\"%lf\" y=\"40\"> Imóvel: Tamanho: %.2lf m², Valor: %.2lf mensais </text>\n", getLeasingX(leasing), getSaleAr(sale), getSaleV(sale));
+    
+
+        leasingDelete(leasing);
+        hashTableRemove(leasingTable, key);
+
+        char* cpf = getResidentCpf(resident);
+        residentDelete(resident);
+        hashTableRemove(residentTable, cpf);
+
+    }else{
+
+        fprintf(txt, "Locação: Id: %s, Cep: %s, Face: %c, Numero: %d, Complemento: %s, Imóvel: Área: %lfm², Preço: %.2lf mensais\n", getSaleId(sale), getSaleCep(sale), getSaleSide(sale), getSaleNumber(sale), getSaleComplement(sale), getSaleAr(sale), getSaleV(sale));
+        fprintf(svg,"\t<line x1=\"%lf\" y1=\"%lf\" x2=\"%lf\" y2=\"0\" style=\"stroke:rgb(255,0,0);stroke-width:2\" />\n",getSaleX(sale), getSaleY(sale), getSaleX(sale));
+        fprintf(svg, "\t<text x=\"%lf\" y=\"0\" >Locação: Id: %s, Cep: %s, Face: %c, Numero: %d, Complemento: %s, Área: %lfm², Preço: %.2lf mensais</text>\n",getSaleX(sale), getSaleId(sale), getSaleCep(sale), getSaleSide(sale), getSaleNumber(sale), getSaleComplement(sale), getSaleAr(sale), getSaleV(sale));
+    }
+
+    setSaleLeasing(sale, -1);
+}
+
+void commandHom(FILE* txt, FILE* svg, HashTable leasingTable, HashTable residentTable, double x, double y, double w, double h){
+
+
+    for(int i = 0; i < getHashTableSize(residentTable); i++){
+        List list = getHashTableList(residentTable, i);
+
+        for(NodeL nodeAux = getListFirst(list); nodeAux; nodeAux = getListNext(nodeAux)){
+            Resident resident = getHashTableListItem(getListInfo(nodeAux));
+
+            char key[50];
+            sprintf(key,"%s/%c/%d", getResidentCep(resident), getResidentSide(resident), getResidentNumber(resident));
+            Leasing leasing = hashTableSearch(leasingTable, key);
+
+            double xAux = getLeasingX(leasing);
+            double yAux = getLeasingY(leasing);
+            
+            if(xAux >= x && xAux <= (x+w)){
+                if(yAux >= y && yAux <= (y+h)){
+                    Person person = getResidentPerson(resident);
+                    if(getPersonGender(person) == 'M'){
+                        fprintf(svg, "\t<circle cx=\"%lf\" cy=\"%lf\" r=\"3\" fill=\"Blue\" stroke=\"Blue\"/>\n",xAux, yAux);
+                        fprintf(txt, "Moradia: Cep: %s, Face: %c, Numero: %d, Complemento: %s, Pessoa: Cpf: %s Nome: %s Sobrenome: %s, Sexo: %c, Data de Nascimento: %d/%d/%d\n", getLeasingCep(leasing), getLeasingSide(leasing), getLeasingNum(leasing), getLeasingComplement(leasing), getPersonCpf(person), getPersonName(person), getPersonSurname(person), getPersonGender(person), getPersonDay(person), getPersonMonth(person), getPersonYear(person));
+                    }
+                }
+            }
+        }
+    }
+
+}
+
+void commandMul(FILE* txt, FILE* svg, HashTable leasingTable, HashTable residentTable, double x, double y, double w, double h){
+
+
+    for(int i = 0; i < getHashTableSize(residentTable); i++){
+        List list = getHashTableList(residentTable, i);
+
+        for(NodeL nodeAux = getListFirst(list); nodeAux; nodeAux = getListNext(nodeAux)){
+            Resident resident = getHashTableListItem(getListInfo(nodeAux));
+
+            char key[50];
+            sprintf(key,"%s/%c/%d", getResidentCep(resident), getResidentSide(resident), getResidentNumber(resident));
+            Leasing leasing = hashTableSearch(leasingTable, key);
+
+            double xAux = getLeasingX(leasing);
+            double yAux = getLeasingY(leasing);
+            
+            if(xAux >= x && xAux <= (x+w)){
+                if(yAux >= y && yAux <= (y+h)){
+                    Person person = getResidentPerson(resident);
+                    if(getPersonGender(person) == 'F'){
+                        fprintf(svg, "\t<circle cx=\"%lf\" cy=\"%lf\" r=\"3\" fill=\"Pink\" stroke=\"Pink\"/>\n",xAux, yAux);
+                        fprintf(txt, "Moradia: Cep: %s, Face: %c, Numero: %d, Complemento: %s, Pessoa: Cpf: %s Nome: %s Sobrenome: %s, Sexo: %c, Data de Nascimento: %d/%d/%d\n", getLeasingCep(leasing), getLeasingSide(leasing), getLeasingNum(leasing), getLeasingComplement(leasing), getPersonCpf(person), getPersonName(person), getPersonSurname(person), getPersonGender(person), getPersonDay(person), getPersonMonth(person), getPersonYear(person));
+                    }
+                }
+            }
+        }
+    }
+
+}
+
 int readQry(char *pathIn, char* pathOut ,char *nameQry, char *nameGeo, City city, HashTable personTable, HashTable leasingTable, HashTable residentTable){
 
     if(!nameQry){
@@ -332,7 +450,7 @@ int readQry(char *pathIn, char* pathOut ,char *nameQry, char *nameGeo, City city
         if(strcmp(command, "del") == 0){
             fscanf(qry, "%s\n", cep);
             fprintf(txt,"del\n");
-            commandDel(txt , svg, city, leasingTable, cep);
+            commandDel(txt , svg, city, leasingTable, residentTable, saleTable, cep);
 
 
         }else if(strcmp(command, "m?") == 0){
@@ -384,21 +502,22 @@ int readQry(char *pathIn, char* pathOut ,char *nameQry, char *nameGeo, City city
 
 
         }else if((strcmp(command, "dloc") == 0)){
-            fscanf(qry, "%s %s\n", id, cpf);
+            fscanf(qry, "%s\n", id);
             fprintf(txt, "dloc\n");
+            commandDloc(txt, svg, saleTable, residentTable, leasingTable, id);
 
 
 
         }else if((strcmp(command, "hom") == 0)){
-            fscanf(qry, "%s %s\n", id, cpf);
+            fscanf(qry, "%lf %lf %lf %lf\n", &x, &y, &w, &h);
             fprintf(txt, "hom\n");
-
+            commandHom(txt, svg, leasingTable, residentTable, x, y, w, h);
 
 
         }else if((strcmp(command, "mul") == 0)){
-            fscanf(qry, "%s %s\n", id, cpf);
+            fscanf(qry, "%lf %lf %lf %lf\n", &x, &y, &w, &h);
             fprintf(txt, "mul\n");
-
+            commandMul(txt, svg, leasingTable, residentTable, x, y, w, h);
 
 
         }else if((strcmp(command, "dmpt") == 0)){
