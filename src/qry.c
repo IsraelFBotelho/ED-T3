@@ -78,7 +78,7 @@ void commandDel(FILE* txt, FILE* svg, City city, HashTable leasingTable, HashTab
 
             if(strcmp(cep, getSaleCep(sale)) == 0){
                 
-                fprintf(txt, "Oferta: Id: %s, Cep: %s, Face: %c, Numero: %d, Complemento: %s, Área: %.2lf, Valor: %.2lf mensais", getSaleId(sale), getSaleCep(sale), getSaleSide(sale), getSaleNumber(sale), getSaleComplement(sale), getSaleAr(sale), getSaleV(sale));
+                fprintf(txt, "Oferta: Id: %s, Cep: %s, Face: %c, Numero: %d, Complemento: %s, Área: %.2lf, Valor: %.2lf mensais\n", getSaleId(sale), getSaleCep(sale), getSaleSide(sale), getSaleNumber(sale), getSaleComplement(sale), getSaleAr(sale), getSaleV(sale));
                 
                 hashTableRemove(saleTable, getSaleId(sale));
                 saleDelete(sale);
@@ -165,7 +165,7 @@ void commandMud(FILE* txt, FILE* svg, City city, HashTable residentTable, HashTa
 
     Person person = getResidentPerson(resident);
 
-    fprintf(txt, "Morador: Nome: %s, Sobrenome: %s, Sexo: %c, Data de Nascimento: %d/%d/%d, Antigo Endereço: Cep: %s, Face: %c, Numero: %d, Complemento: %s ", getPersonName(person), getPersonSurname(person), getPersonGender(person), getPersonDay(person), getPersonMonth(person), getPersonYear(person), getResidentCep(resident), getResidentSide(resident), getResidentNumber(resident), getResidentComplement(resident));
+    fprintf(txt, "Morador: Nome: %s, Sobrenome: %s, Sexo: %c, Data de Nascimento: %d/%d/%d, Antigo Endereço: Cep: %s, Face: %c, Numero: %d, Complemento: %s \n", getPersonName(person), getPersonSurname(person), getPersonGender(person), getPersonDay(person), getPersonMonth(person), getPersonYear(person), getResidentCep(resident), getResidentSide(resident), getResidentNumber(resident), getResidentComplement(resident));
 
     residentDelete(resident);
     hashTableRemove(residentTable, cpf);
@@ -407,6 +407,52 @@ void commandMul(FILE* txt, FILE* svg, HashTable leasingTable, HashTable resident
 
 }
 
+void recCommandCatac(List listBlocks, Node root, double x, double y, double w, double h){
+    if(root == NULL){
+        return;
+    }
+
+    recCommandCatac(listBlocks , getTreeLeft(root), x, y, w, h);
+    recCommandCatac(listBlocks , getTreeRight(root), x, y, w, h);
+
+    List list = getTreeNodeItens(root);
+
+    for(NodeL nodeAux = getListFirst(list); nodeAux; nodeAux = getListNext(nodeAux)){
+        Block block = getTreeListItem(getListInfo(nodeAux));
+
+        double xAux = getBlockX(block);
+        double yAux = getBlockY(block);
+        double wAux = getBlockWidth(block);
+        double hAux = getBlockHeight(block);
+
+        if((xAux + wAux) >= x && xAux <= (x+w)){
+            if((yAux + hAux) >= y && yAux <= (y+h)){
+                insertListElement(listBlocks, block);
+            }
+        }
+    }
+}
+
+void commandCatac(FILE* txt, FILE* svg, City city, HashTable leasingTable, HashTable residentTable, HashTable saleTable, double x, double y, double w, double h){
+
+    fprintf(svg,"\t<rect id=\"catac\" x=\"%lf\" y=\"%lf\" width=\"%lf\" height=\"%lf\" stroke=\"#AA0044\" fill=\"#AB37C8\" fill-opacity=\"0.5\" stroke-opacity=\"0.5\"/>\n", x, y, w, h);
+
+    List listBlock = createList();
+    recCommandCatac(listBlock, getTreeRoot(getCityTree(city)), x, y, w, h);
+
+    for(NodeL nodeAux = getListFirst(listBlock); nodeAux; nodeAux = getListFirst(listBlock)){
+        Block block = getListInfo(nodeAux);
+
+        commandDel(txt, svg, city, leasingTable, residentTable, saleTable, getBlockCep(block));
+    }
+
+    endList(listBlock);
+}
+
+void commandDmpt(){
+
+}
+
 int readQry(char *pathIn, char* pathOut ,char *nameQry, char *nameGeo, City city, HashTable personTable, HashTable leasingTable, HashTable residentTable){
 
     if(!nameQry){
@@ -521,14 +567,14 @@ int readQry(char *pathIn, char* pathOut ,char *nameQry, char *nameGeo, City city
 
 
         }else if((strcmp(command, "dmpt") == 0)){
-            fscanf(qry, "%s %s\n", id, cpf);
+            fscanf(qry, "%s\n", sfx);
 
 
 
         }else if((strcmp(command, "catac") == 0)){
-            fscanf(qry, "%s %s\n", id, cpf);
+            fscanf(qry, "%lf %lf %lf %lf\n", &x, &y, &w, &h);
             fprintf(txt, "catac\n");
-
+            commandCatac(txt, svg, city, leasingTable, residentTable, saleTable, x, y, w, h);
 
 
         }
