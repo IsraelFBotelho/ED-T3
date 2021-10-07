@@ -8,6 +8,7 @@
 #include "person.h"
 #include "svg.h"
 #include "resident.h"
+#include "sale.h"
 
 FILE *getTxtFile(char* nameArq, char* pathOut){
     char t[] = "txt";
@@ -106,7 +107,7 @@ void commandDMQMark(FILE* txt, FILE* svg, HashTable residentTable, HashTable lea
     Resident resident = hashTableSearch(residentTable, cpf);
 
     if(resident == NULL){
-        fprintf(txt,"Erro: Morador não encontrado!!!\n");
+        printf("Comando Dm: Erro! Morador não encontrado!!!\n");
         return;
     }
 
@@ -131,8 +132,10 @@ void commandDMQMark(FILE* txt, FILE* svg, HashTable residentTable, HashTable lea
 
 void commandMud(FILE* txt, FILE* svg, City city, HashTable residentTable, HashTable leasingTable, char* cpf, char* cep, char side, int num, char* complement){
     Resident resident = hashTableSearch(residentTable, cpf);
+
     if(resident == NULL){
-        fprintf(txt, "Erro: Morador não encontrado");
+        printf("Comando Mud: Erro! Morador não encontrado\n");
+        return;
     }
     char key[50];
     sprintf(key, "%s/%c/%d", getResidentCep(resident), getResidentSide(resident), getResidentNumber(resident));
@@ -140,6 +143,7 @@ void commandMud(FILE* txt, FILE* svg, City city, HashTable residentTable, HashTa
 
     double x1 = getLeasingX(leasing);
     double y1 = getLeasingY(leasing);
+    setLeasingResident(leasing, NULL);
 
     Person person = getResidentPerson(resident);
 
@@ -169,8 +173,85 @@ void commandMud(FILE* txt, FILE* svg, City city, HashTable residentTable, HashTa
     double y2 = getLeasingY(leasing);
 
     fprintf(svg, "\t<line x1=\"%lf\" y1=\"%lf\" x2=\"%lf\" y2=\"%lf\" style=\"stroke:rgb(255,0,0);stroke-width:2\" />\n", x1, y1, x2, y2);
-    fprintf(svg, "\t<circle  cx=\"%lf\" cy=\"%lf\" r=\"5\" stroke=\"white\" stroke-width=\"5\" fill=\"red\"/>\n", x1, y1);
-    fprintf(svg, "\t<circle  cx=\"%lf\" cy=\"%lf\" r=\"5\" stroke=\"white\" stroke-width=\"5\" fill=\"blue\"/>\n", x2, y2);
+    fprintf(svg, "\t<circle  cx=\"%lf\" cy=\"%lf\" r=\"10\" stroke=\"white\" stroke-width=\"5\" fill=\"red\"/>\n", x1, y1);
+    fprintf(svg, "\t<circle  cx=\"%lf\" cy=\"%lf\" r=\"10\" stroke=\"white\" stroke-width=\"5\" fill=\"blue\"/>\n", x2, y2);
+} 
+
+void commandOlocQMark(FILE* txt, FILE* svg, HashTable saleTable, double x, double y, double w, double h){
+    fprintf(svg, "\t<rect id=\"oloc?\" x=\"%lf\" y=\"%lf\" width=\"%lf\" height=\"%lf\" stroke=\"Red\" fill=\"none\" stroke-dasharray=\"2\"/>\n", x, y, w, h);
+
+    for(int i = 0; i < getHashTableSize(saleTable); i++){
+        List saleList = getHashTableList(saleTable, i);
+
+        for(NodeL nodeSale = getListFirst(saleList); nodeSale; nodeSale = getListNext(nodeSale)){
+            Sale sale = getHashTableListItem(getListInfo(nodeSale));
+            double xAux = getSaleX(sale);
+            double yAux = getSaleY(sale);
+            
+            if(xAux >= x && xAux <= (x+w)){
+                if(yAux >= y && yAux <= (y+h)){
+                    if(isSaleLeasing(sale) == 0){
+                        fprintf(svg, "\t<text x=\"%lf\" y=\"%lf\">*</text>",xAux, yAux);
+                        fprintf(txt, "Locação: Id: %s, Cep: %s, Face: %c, Numero: %d, Complemento: %s, Área: %lfm², Preço: %.2lf mensais\n", getSaleId(sale), getSaleCep(sale), getSaleSide(sale), getSaleNumber(sale), getSaleComplement(sale), getSaleAr(sale), getSaleV(sale));
+                    }
+                }
+            }
+        }
+    }
+}
+
+void commandLoc(FILE* txt, FILE* svg, City city, HashTable personTable, HashTable leasingTable, HashTable residentTable, HashTable saleTable, char* id, char* cpf){
+
+    Sale sale = hashTableSearch(saleTable, id);
+
+    if(sale == NULL){
+        printf("Comando-Loc: Erro! Oferta não encontrada!\n");
+        return;
+    }
+
+    Resident auxResident = hashTableSearch(residentTable, cpf);
+    if(auxResident != NULL){
+        char key[50];
+        sprintf(key, "%s/%c/%d", getResidentCep(auxResident), getResidentSide(auxResident), getResidentNumber(auxResident));
+        Leasing auxLeasing = hashTableSearch(leasingTable, key);
+        setLeasingResident(auxLeasing, NULL);
+        residentDelete(auxResident);
+        hashTableRemove(residentTable, cpf);
+
+    }
+
+
+    char* cep = getSaleCep(sale);
+    char side = getSaleSide(sale);
+    int number = getSaleNumber(sale);
+    char* complement = getSaleComplement(sale);
+
+    Leasing leasing = leasingCreate(getCityHashTable(city), cep, side, number, complement);
+
+    if(leasing != NULL){
+        Person person = hashTableSearch(personTable, cpf);
+
+        if(person != NULL){
+            char key[100];
+            sprintf(key, "%s/%c/%d", cep, side, number);
+            hashTableInsert(leasingTable, key, leasing);
+            Resident resident = residentCreate(cpf, cep, side, number, complement, person, 1);
+            hashTableInsert(residentTable, cpf, resident);
+            setLeasingResident(leasing, resident);
+            setSaleLeasing(sale, 1);
+
+            fprintf(txt, "Locação: Id: %s, Cep: %s, Face: %c, Numero: %d, Complemento: %s, Imóvel: Área: %lfm², Preço: %.2lf mensais, Pessoa: Cpf: %s  Nome: %s, Sobrenome: %s, Sexo: %c, Data de Nascimento: %d/%d/%d\n", getSaleId(sale), getSaleCep(sale), getSaleSide(sale), getSaleNumber(sale), getSaleComplement(sale), getSaleAr(sale), getSaleV(sale), getPersonCpf(person), getPersonName(person), getPersonSurname(person), getPersonGender(person), getPersonDay(person), getPersonMonth(person), getPersonYear(person));
+
+            fprintf(svg,"\t<line x1=\"%lf\" y1=\"%lf\" x2=\"%lf\" y2=\"0\" style=\"stroke:rgb(255,0,0);stroke-width:2\" />\n", getLeasingX(leasing), getLeasingY(leasing), getLeasingX(leasing));
+            fprintf(svg, "\t<text x=\"%lf\" y=\"0\"> Pessoa: Cpf:%s, Nome:%s, Sobrenome:%s, Sexo:%c, Nascimento: %d/%d/%d</text>\n", getLeasingX(leasing), getPersonCpf(person), getPersonName(person), getPersonSurname(person), getPersonGender(person), getPersonDay(person), getPersonMonth(person), getPersonYear(person));
+            fprintf(svg, "\t<text x=\"%lf\" y=\"20\"> Locação: Cep: %s, Face:%c, Numero:%d, Complemento:%s  </text>\n", getLeasingX(leasing), getLeasingCep(leasing), getLeasingSide(leasing), getLeasingNum(leasing), getLeasingComplement(leasing));
+            fprintf(svg, "\t<text x=\"%lf\" y=\"40\"> Imóvel: Tamanho: %.2lf m², Valor: %.2lf mensais </text>\n", getLeasingX(leasing), getSaleAr(sale), getSaleV(sale));
+    
+        }else{
+            leasingDelete(leasing);
+        }
+    }
+
 }
 
 int readQry(char *pathIn, char* pathOut ,char *nameQry, char *nameGeo, City city, HashTable personTable, HashTable leasingTable, HashTable residentTable){
@@ -208,6 +289,8 @@ int readQry(char *pathIn, char* pathOut ,char *nameQry, char *nameGeo, City city
     FILE *txt = getTxtFile(fullNameQry, pathOut);
     FILE *svg = createSvg(fullPathSvg);
 
+    HashTable saleTable = hashTableCreate(1000);
+
     while(!feof(qry)){
         fscanf(qry,"%s",command);
 
@@ -216,15 +299,18 @@ int readQry(char *pathIn, char* pathOut ,char *nameQry, char *nameGeo, City city
             fprintf(txt,"del\n");
             commandDel(txt , svg, city, leasingTable, cep);
 
+
         }else if(strcmp(command, "m?") == 0){
             fscanf(qry, "%s\n", cep);
             fprintf(txt, "m?\n");
             commandMQMark(txt, city, residentTable, cep);
 
+
         }else if(strcmp(command, "dm?") == 0){
             fscanf(qry, "%s\n", cpf);
             fprintf(txt, "dm?\n");
             commandDMQMark(txt, svg, residentTable, leasingTable, cpf);
+
 
         }else if(strcmp(command, "mud") == 0){
             fscanf(qry, "%s %s %c %d %s\n", cpf, cep, &side, &num, compl);
@@ -232,18 +318,36 @@ int readQry(char *pathIn, char* pathOut ,char *nameQry, char *nameGeo, City city
             commandMud(txt, svg, city, residentTable, leasingTable, cpf, cep, side, num, compl);
 
 
-        }else if(strcmp(command, "t30") == 0){
-            fscanf(qry, "\n");
-            fprintf(txt, "t30\n");
+        }else if(strcmp(command, "oloc") == 0){
+            fscanf(qry, "%s %s %c %d %s %lf %lf\n", id, cep, &side, &num, compl, &ar, &v);
+            Sale sale = saleCreate(getCityHashTable(city), id, cep, side, num, compl, ar, v);
+            if(sale == NULL){
+                printf("Erro: CEP para OLOC é desconhecido\n");
+
+            }else{
+            hashTableInsert(saleTable, id, sale);
+
+            }
 
 
-        }else if((strcmp(command, "nve") == 0)){
-            fscanf(qry, "%lf %lf\n", &x, &y);
-            fprintf(txt, "nve\n");
+        }else if((strcmp(command, "oloc?") == 0)){
+            fscanf(qry, "%lf %lf %lf %lf\n", &x, &y, &w, &h);
+            fprintf(txt, "oloc?\n");
+            commandOlocQMark(txt, svg, saleTable, x, y, w, h);
+
+
+        }else if((strcmp(command, "loc") == 0)){
+            fscanf(qry, "%s %s\n", id, cpf);
+            fprintf(txt, "loc\n");
+            commandLoc(txt, svg, city, personTable, leasingTable, residentTable, saleTable, id, cpf);
 
         }
     }
     drawBlocks(svg, getCityTree(city));
+
+
+    saleDeleteAll(saleTable);
+    hashTableEnd(saleTable);
 
     endSvg(svg);
     fclose(txt);

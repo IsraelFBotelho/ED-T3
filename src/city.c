@@ -37,14 +37,14 @@ int cityEnd(City city){
 }
 
 // Insere nas estruturas da cidade um elemento
-int cityInsert(City city, Info info, double keyX, double keyY, char* keyHash){
+int cityInsert(City city, Info info, double keyX, double keyY, double width, char* keyHash){
     CityStruct* cityAux = (CityStruct* ) city;
 
     if(cityAux == NULL){
         return 0;
     }
 
-    int tree = treeInsert(cityAux->tree, info, keyX, keyY);
+    int tree = treeInsert(cityAux->tree, info, keyX, keyY, width);
     int table = hashTableInsert(cityAux->table, keyHash, info);
 
     // printf("%s\n", getBlockCep(info));

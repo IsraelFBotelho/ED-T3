@@ -27,7 +27,7 @@ Pré: Um void* com o endereço da cidade, um void* com a info, um double a chave
      um char* com uma chave para hash;
 Pós: Retorna um int caso bem sucedido ou 0 para falha.
 */
-int cityInsert(City city, Info info, double keyX, double keyY, char* keyHash);
+int cityInsert(City city, Info info, double keyX, double keyY, double width, char* keyHash);
 
 /*
 */

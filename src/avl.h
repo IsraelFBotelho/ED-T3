@@ -14,7 +14,7 @@ Função: Dado uma arvore, um ponteiro pra Info e uma chave, insere na árvore e
 Pré: void* para a árvore, void* para a info, double com valor de x, double com valor de y.
 Pós: Retorna 1 caso bem sucedido ou 0 para key de valor igual.
 */
-int treeInsert(Tree tree, Info info, double keyX, double keyY);
+int treeInsert(Tree tree, Info info, double keyX, double keyY, double width);
 
 /*
 Função: Dado uma árvore e uma chave, acha o nó correspondete e o remove da árvore.
@@ -75,5 +75,9 @@ List getTreeNodeItens(Node root);
 Info getTreeListItem(Info item);
 
 double getTreeListKeyY(Info item);
+
+double getTreeBiggerX(Node root);
+
+double getTreeLesserX(Node root);
 
 #endif

@@ -37,16 +37,16 @@ Leasing leasingCreate(HashTable table, char* cep, char side, int num, char* comp
     }
 
     if(side == 'S'){
-        new->y = getBlockY(new->block);
+        new->y = getBlockY(new->block) + (num/2);
         new->x = getBlockX(new->block) + num;
     }else if(side == 'N'){
         new->x = getBlockX(new->block) + num;
-        new->y = getBlockY(new->block) + getBlockHeight(new->block);
+        new->y = getBlockY(new->block) + getBlockHeight(new->block) - (num/2);
     }else if(side == 'L'){
-        new->x = getBlockX(new->block);
+        new->x = getBlockX(new->block) + (num/2);
         new->y = getBlockY(new->block) + num;
     }else{
-        new->x = getBlockX(new->block) + getBlockWidth(new->block);
+        new->x = getBlockX(new->block) + getBlockWidth(new->block) - (num/2);
         new->y = getBlockY(new->block) + num;
     }
 

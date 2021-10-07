@@ -46,7 +46,7 @@ void readGeo(char* path, char* name, City* city){
         if(strcmp(command, "q") == 0){
             fscanf(geo, "%s  %lf %lf %lf %lf\n", cep, &x, &y, &width, &height);
             Block block = blockCreate(cep, x, y, width, height, fill, stroke, strokeThickness);
-            cityInsert(*city, block, x, y, cep);
+            cityInsert(*city, block, x, y, width, cep);
         
         // Comando "cq" 
         }else if(strcmp(command, "cq") == 0){

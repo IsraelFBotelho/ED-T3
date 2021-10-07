@@ -149,7 +149,7 @@ void rotateRL(NodeStruct** root){
 }
 
 // Função de inserção recursiva
-int recTreeInsert(NodeStruct** root, Info info, double keyX, double keyY){
+int recTreeInsert(NodeStruct** root, Info info, double keyX, double keyY, double width){
     int res = 0;
     // Nó folha ou primeiro nó
     if(*root == NULL){
@@ -169,7 +169,7 @@ int recTreeInsert(NodeStruct** root, Info info, double keyX, double keyY){
         new->right = NULL;
         new->height = 0;
         new->key = keyX;
-        new->biggerX = keyX;
+        new->biggerX = keyX + width;
         new->lesserX = keyX;
         *root = new;
         return 1;
@@ -179,8 +179,8 @@ int recTreeInsert(NodeStruct** root, Info info, double keyX, double keyY){
 
 
     // Enquanto for passando pelos nós atualiza o maior e menor :)
-    if(this->biggerX < keyX){
-        this->biggerX = keyX;
+    if(this->biggerX < keyX + width){
+        this->biggerX = keyX + width;
     }
     if(this->lesserX > keyX){
         this->lesserX = keyX;
@@ -188,7 +188,7 @@ int recTreeInsert(NodeStruct** root, Info info, double keyX, double keyY){
 
     // Adiciona a esquerda e se precisar rotaciona a arvore
     if(keyX < this->key){
-        if((res=recTreeInsert(&(this->left), info, keyX, keyY)) == 1){
+        if((res=recTreeInsert(&(this->left), info, keyX, keyY, width)) == 1){
             if(nodeFactor(this) >= 2){
                 if(keyX < this->left->key){
                     rotateLL(root);
@@ -200,7 +200,7 @@ int recTreeInsert(NodeStruct** root, Info info, double keyX, double keyY){
     }else{
         // Adiciona a direita e se precisar rotaciona a arvore
         if(keyX > this->key){
-            if((res = recTreeInsert(&(this->right), info, keyX, keyY)) == 1){
+            if((res = recTreeInsert(&(this->right), info, keyX, keyY, width)) == 1){
                 if(nodeFactor(this) >= 2){
                     if(keyX > this->right->key){
                         rotateRR(root);
@@ -225,9 +225,9 @@ int recTreeInsert(NodeStruct** root, Info info, double keyX, double keyY){
 }
 
 // Chama a função recursiva de inserir
-int treeInsert(Tree tree, Info info, double keyX, double keyY){
+int treeInsert(Tree tree, Info info, double keyX, double keyY, double width){
     TreeStruct* treeAux = (TreeStruct* ) tree;
-    int aux = recTreeInsert(&(treeAux->root), info, keyX, keyY);
+    int aux = recTreeInsert(&(treeAux->root), info, keyX, keyY, width);
 
     if(aux == 1){
         treeAux->size++;
@@ -382,10 +382,6 @@ List recTreeSearch(NodeStruct* root, double keyX){
         return root->list;
     }
 
-    if(keyX > root->biggerX || keyX < root->lesserX){
-        return NULL;
-    }
-
     List aux;
 
     if(keyX > root->key){
@@ -458,4 +454,16 @@ double getTreeListKeyY(Info item){
     Item* itemAux = (Item* ) item;
 
     return itemAux->keyY;
+}
+
+double getTreeBiggerX(Node root){
+    NodeStruct* rootAux = (NodeStruct* ) root;
+
+    return rootAux->biggerX;
+}
+
+double getTreeLesserX(Node root){
+    NodeStruct* rootAux = (NodeStruct* ) root;
+
+    return rootAux->lesserX;
 }
