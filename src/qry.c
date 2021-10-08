@@ -280,6 +280,11 @@ void commandLoc(FILE* txt, FILE* svg, City city, HashTable personTable, HashTabl
 void commandLocQMark(FILE* txt, FILE* svg, HashTable saleTable, HashTable leasingTable, char* id){
     Sale sale = hashTableSearch(saleTable, id);
 
+    if(sale == NULL){
+        printf("Comando Loc?: Erro! Oferta não encontrada!");
+        return;
+    }
+
     char saleStatus;
 
     if(isSaleLeasing(sale) == 0){
