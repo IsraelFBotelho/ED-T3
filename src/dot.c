@@ -58,7 +58,7 @@ void recDrawNodes(FILE* dot, Node root){
     // double lesserX;
     // double biggerX;
 
-    fprintf(dot, "\t\"%lf\" [label=\"X:%lf\\nAltura Do Nó:%d\\nX Máximo:%lf\\nX Mínimo:%lf\\n\"];", keyThis, getTreeKey(root), getTreeHeight(root), getTreeBiggerX(root), getTreeLesserX(root));
+    fprintf(dot, "\t\"%lf\" [label=\"X:%.2lf\\nAltura Do Nó:%d\\nX Máximo:%.2lf\\nX Mínimo:%.2lf\\n\"];", keyThis, getTreeKey(root), getTreeHeight(root), getTreeBiggerX(root), getTreeLesserX(root));
 
     if(left != NULL){
         double keyLeft = getTreeKey(left);

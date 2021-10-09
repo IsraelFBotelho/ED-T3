@@ -21,6 +21,7 @@ typedef struct node {
     struct node* left;
     struct node* right;
     double key;
+    double widthBlock;
     double lesserX;
     double biggerX;
 
@@ -148,6 +149,57 @@ void rotateRL(NodeStruct** root){
     rotateRR(root);
 }
 
+// Busca o menor nó
+NodeStruct* searchLesser(NodeStruct* this){
+    NodeStruct* node1 = this;
+    if(node1 == NULL){
+        return NULL;
+    }
+    NodeStruct* node2 = this->left;
+
+    while(node2 != NULL){
+        node1 = node2;
+        node2 = node2->left;
+    }
+
+    return node1;
+}
+
+// Busca o maior nó
+NodeStruct* searchBigger(NodeStruct* this){
+    NodeStruct* node1 = this;
+    if(node1 == NULL){
+        return NULL;
+    }
+    NodeStruct* node2 = this->right;
+
+
+    while(node2 != NULL){
+        node1 = node2;
+        node2 = node2->right;
+    }
+
+    return node1;
+}
+
+// 
+int recChangeBiggerLesser(NodeStruct* root){
+
+    if(root == NULL){
+        return 0;
+    }
+
+    NodeStruct* big = searchBigger(root->right);
+    NodeStruct* small = searchLesser(root->left);
+    root->biggerX = big != NULL? big->key + big->widthBlock : root->key + root->widthBlock;
+    root->lesserX = small != NULL? small->key : root->key;
+
+    recChangeBiggerLesser(root->left);
+    recChangeBiggerLesser(root->right);
+
+    return 1;
+}
+
 // Função de inserção recursiva
 int recTreeInsert(NodeStruct** root, Info info, double keyX, double keyY, double width){
     int res = 0;
@@ -168,8 +220,9 @@ int recTreeInsert(NodeStruct** root, Info info, double keyX, double keyY, double
         new->left = NULL;
         new->right = NULL;
         new->height = 0;
+        new->widthBlock = width;
         new->key = keyX;
-        new->biggerX = keyX;
+        new->biggerX = keyX + width;
         new->lesserX = keyX;
         *root = new;
         return 1;
@@ -179,8 +232,8 @@ int recTreeInsert(NodeStruct** root, Info info, double keyX, double keyY, double
 
 
     // Enquanto for passando pelos nós atualiza o maior e menor :)
-    if(this->biggerX < keyX){
-        this->biggerX = keyX;
+    if(this->biggerX < keyX + width){
+        this->biggerX = keyX + width;
     }
     if(this->lesserX > keyX){
         this->lesserX = keyX;
@@ -230,44 +283,12 @@ int treeInsert(Tree tree, Info info, double keyX, double keyY, double width){
     int aux = recTreeInsert(&(treeAux->root), info, keyX, keyY, width);
 
     if(aux == 1){
+        recChangeBiggerLesser(treeAux->root);
         treeAux->size++;
     }
 
     return aux;
 
-}
-
-// Busca o menor nó
-NodeStruct* searchLesser(NodeStruct* this){
-    NodeStruct* node1 = this;
-    if(node1 == NULL){
-        return NULL;
-    }
-    NodeStruct* node2 = this->left;
-
-    while(node2 != NULL){
-        node1 = node2;
-        node2 = node2->left;
-    }
-
-    return node1;
-}
-
-// Busca o maior nó
-NodeStruct* searchBigger(NodeStruct* this){
-    NodeStruct* node1 = this;
-    if(node1 == NULL){
-        return NULL;
-    }
-    NodeStruct* node2 = this->right;
-
-
-    while(node2 != NULL){
-        node1 = node2;
-        node2 = node2->right;
-    }
-
-    return node1;
 }
 
 // Função de remoção recursiva
@@ -335,7 +356,7 @@ int recTreeRemove(NodeStruct** root, double keyX, double keyY){
                 (*root)->key = temp->key;
                 NodeStruct* big = searchBigger((*root)->right);
                 NodeStruct* small = searchLesser((*root)->left);
-                (*root)->biggerX = big != NULL? big->key : (*root)->key;
+                (*root)->biggerX = big != NULL? big->key + big->widthBlock: (*root)->key + (*root)->widthBlock;
                 (*root)->lesserX = small != NULL? small->key : (*root)->key;
 
                 recTreeRemove(&(*root)->right, (*root)->key, FLAG_STOP_REMOVE);
@@ -353,7 +374,7 @@ int recTreeRemove(NodeStruct** root, double keyX, double keyY){
     // Caso remova o nó troca os maiores e menores
     NodeStruct* big = searchBigger((*root)->right);
     NodeStruct* small = searchLesser((*root)->left);
-    (*root)->biggerX = big != NULL? big->key : (*root)->key;
+    (*root)->biggerX = big != NULL? big->key + big->widthBlock: (*root)->key + (*root)->widthBlock;
     (*root)->lesserX = small != NULL? small->key : (*root)->key;
 
 
