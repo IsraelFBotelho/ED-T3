@@ -12,8 +12,10 @@
 #include "person.h"
 #include "resident.h"
 
+// Função main
 int main(int argc, char* argv[]){
 
+    // Inicializando valores
     char *pathOut = NULL;
     char *pathIn = NULL;
     char *nameArqGeo = NULL;
@@ -24,16 +26,23 @@ int main(int argc, char* argv[]){
     HashTable leasingTable = NULL;
     HashTable residentTable = NULL;
 
+    // Leitura dos argumentos da linha de comando
     readArg(argc, argv, &pathOut, &pathIn, &nameArqGeo, &nameArqQry, &nameArqPm);
 
+    // Leitura e armazenamento do .geo
     readGeo(pathIn, nameArqGeo, &city);
 
+    // Desenhando o .svg do .geo
     writeGeoSvg(pathOut, nameArqGeo, city);
 
+    // Leitura e armazenamento do .pm
     readPm(pathIn, nameArqPm, city, &personTable, &leasingTable, &residentTable);
 
+    // Leitura e modificações do .qry
     readQry(pathIn, pathOut, nameArqQry, nameArqGeo, city, personTable, leasingTable, residentTable);
 
+
+    // Desalocação de valores
 
     blockDeleteAll(getCityTree(city), getCityHashTable(city));
 
@@ -42,8 +51,6 @@ int main(int argc, char* argv[]){
     personDeleteAll(personTable);
 
     residentDeleteAll(residentTable);
-
-    // printf("%d", test);
 
     hashTableEnd(personTable);
     hashTableEnd(leasingTable);

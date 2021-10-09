@@ -11,6 +11,7 @@
 #include "sale.h"
 #include "dot.h"
 
+// Gera um .txt escreve o nome do aluno
 FILE *getTxtFile(char* nameArq, char* pathOut){
     char t[] = "txt";
     char* nameTxt = t;
@@ -35,6 +36,7 @@ FILE *getTxtFile(char* nameArq, char* pathOut){
     
 }
 
+// Concatena o nome do .geo e .qry
 char *getQryFileName(char* fullNameGeo, char* nameQry){
     char* nameGeo = extractName(fullNameGeo);
     char* fullName = malloc((strlen(nameGeo) + strlen(nameQry) + 2) *sizeof(char));
@@ -44,7 +46,10 @@ char *getQryFileName(char* fullNameGeo, char* nameQry){
     return fullName;
 }
 
+// Comando del {Deleta uma quadra a partir do seu CEP e tudo relacionado a ela}
 void commandDel(FILE* txt, FILE* svg, City city, HashTable leasingTable, HashTable residentTable, HashTable saleTable, char* cep){
+    
+    // Deleta as locações que estão no CEP
     for(int i = 0; i < getHashTableSize(leasingTable); i++){
         List list = getHashTableList(leasingTable, i);
 
@@ -55,8 +60,8 @@ void commandDel(FILE* txt, FILE* svg, City city, HashTable leasingTable, HashTab
                 fprintf(txt, "Locação: Cep: %s, Face: %c, Numero: %d, Complemento: %s\n",getLeasingCep(leasing), getLeasingSide(leasing), getLeasingNum(leasing), getLeasingComplement(leasing));
                 char key[50];
                 sprintf(key, "%s/%c/%d", getLeasingCep(leasing), getLeasingSide(leasing), getLeasingNum(leasing));
-                printf("%s\n",key);
 
+                // Deleta os moradores da locação
                 Resident resident = getLeasingResident(leasing);
                 Person person = getResidentPerson(resident);
                 fprintf(txt, "Morador: Cpf: %s, Nome: %s, Sobrenome: %s, Sexo: %c, Nascimento: %d/%d/%d, Endereço: %s, %c, %d, %s\n", getPersonCpf(person), getPersonName(person), getPersonSurname(person), getPersonGender(person), getPersonDay(person), getPersonMonth(person), getPersonYear(person), getResidentCep(resident), getResidentSide(resident), getResidentNumber(resident), getResidentComplement(resident));
@@ -71,6 +76,8 @@ void commandDel(FILE* txt, FILE* svg, City city, HashTable leasingTable, HashTab
             }
         }
     }
+
+    // Deleta as ofertas no CEP
     for(int i = 0; i < getHashTableSize(saleTable); i++){
         List list = getHashTableList(saleTable, i);
 
@@ -91,6 +98,7 @@ void commandDel(FILE* txt, FILE* svg, City city, HashTable leasingTable, HashTab
         }
     }
 
+    // Deleta a quadra
     double x, y;
     Block block = hashTableSearch(getCityHashTable(city), cep);
     x = getBlockX(block) + (getBlockWidth(block) / 2);
@@ -101,19 +109,25 @@ void commandDel(FILE* txt, FILE* svg, City city, HashTable leasingTable, HashTab
     cityRemovebyCep(city, cep);
 }
 
+// Comando m? {Lista os moradores de um CEP}
 void commandMQMark(FILE* txt, City city, HashTable residentTable, char* cep){
+
+    // Caso a quadra não existe reporta erro!
     Block block = hashTableSearch(getCityHashTable(city), cep);
     if(block == NULL){
         fprintf(txt, "Erro: Quadra não existe!!\n");
         return;
     }
 
+    // Percorre a tabela e verifica o cep da residencia do morador
     for(int i = 0; i < getHashTableSize(residentTable); i++){
         List list = getHashTableList(residentTable, i);
 
         for(NodeL nodeAux = getListFirst(list); nodeAux; nodeAux = getListNext(nodeAux)){
             Resident resident = getHashTableListItem(getListInfo(nodeAux));
             if(strcmp(cep, getResidentCep(resident)) == 0){
+
+                // Se mora no CEP, notifica no .txt
                 Person person = getResidentPerson(resident);
                 fprintf(txt, "Morador: Nome: %s, Sobrenome: %s, Sexo: %c, Data de Nascimento: %d/%d/%d, Cpf: %s, Endereço: Cep: %s, Face: %c, Numero: %d, Complemento: %s\n", getPersonName(person), getPersonSurname(person), getPersonGender(person), getPersonDay(person), getPersonMonth(person), getPersonYear(person), getResidentCpf(resident), getResidentCep(resident), getResidentSide(resident), getResidentNumber(resident), getResidentComplement(resident));
             }
@@ -121,15 +135,18 @@ void commandMQMark(FILE* txt, City city, HashTable residentTable, char* cep){
     }
 }
 
+// Comando dm? {Imprime as informações de um morador a partir de seu CPF}
 void commandDMQMark(FILE* txt, FILE* svg, HashTable residentTable, HashTable leasingTable, char* cpf){
 
     Resident resident = hashTableSearch(residentTable, cpf);
 
+    // Caso o morador não exista não faz nada!
     if(resident == NULL){
-        printf("Comando Dm: Erro! Morador não encontrado!!!\n");
+        // printf("Comando Dm: Erro! Morador não encontrado!!!\n");
         return;
     }
 
+    // Com as informações do morador se acha sua locação e imprime tudo relacionado aos dois
     char key[50];
     sprintf(key, "%s/%c/%d", getResidentCep(resident), getResidentSide(resident), getResidentNumber(resident));
     Leasing leasing = hashTableSearch(leasingTable, key);
@@ -149,13 +166,16 @@ void commandDMQMark(FILE* txt, FILE* svg, HashTable residentTable, HashTable lea
     fprintf(txt, "Morador: Nome: %s, Sobrenome: %s, Sexo: %c, Data de Nascimento: %d/%d/%d, Cpf: %s, Endereço: Cep: %s, Face: %c, Numero: %d, Complemento: %s, É alugada? %s\n", getPersonName(person), getPersonSurname(person), getPersonGender(person), getPersonDay(person), getPersonMonth(person), getPersonYear(person), getResidentCpf(resident), getResidentCep(resident), getResidentSide(resident), getResidentNumber(resident), getResidentComplement(resident), rent);
 }
 
+// Comando mud {Muda uma pessoa de uma locação para outra}
 void commandMud(FILE* txt, FILE* svg, City city, HashTable residentTable, HashTable leasingTable, char* cpf, char* cep, char side, int num, char* complement){
     Resident resident = hashTableSearch(residentTable, cpf);
 
     if(resident == NULL){
-        printf("Comando Mud: Erro! Morador não encontrado\n");
+        // printf("Comando Mud: Erro! Morador não encontrado\n");
         return;
     }
+    
+    // Encontra a locação atual da pessoa, reporta os dados e apaga o morador
     char key[50];
     sprintf(key, "%s/%c/%d", getResidentCep(resident), getResidentSide(resident), getResidentNumber(resident));
     Leasing leasing = hashTableSearch(leasingTable, key);
@@ -171,6 +191,7 @@ void commandMud(FILE* txt, FILE* svg, City city, HashTable residentTable, HashTa
     residentDelete(resident);
     hashTableRemove(residentTable, cpf);
 
+    // Cria um novo morador para a pessoa e reporta os dados
     resident = residentCreate(cpf, cep, side, num, complement, person, 0);
 
     fprintf(txt, "Novo Endereço: Cep: %s, Face: %c, Numero: %d, Complemento: %s\n", cep, side, num, complement);
@@ -196,9 +217,11 @@ void commandMud(FILE* txt, FILE* svg, City city, HashTable residentTable, HashTa
     fprintf(svg, "\t<circle  cx=\"%lf\" cy=\"%lf\" r=\"10\" stroke=\"white\" stroke-width=\"5\" fill=\"blue\"/>\n", x2, y2);
 } 
 
+// Comando oloc? {Verifica quais as ofertas disponíveis em uma área}
 void commandOlocQMark(FILE* txt, FILE* svg, HashTable saleTable, double x, double y, double w, double h){
     fprintf(svg, "\t<rect id=\"oloc?\" x=\"%lf\" y=\"%lf\" width=\"%lf\" height=\"%lf\" stroke=\"Red\" fill=\"none\" stroke-dasharray=\"2\"/>\n", x, y, w, h);
 
+    // Busca na tabela das ofertas e reporta os dados
     for(int i = 0; i < getHashTableSize(saleTable); i++){
         List saleList = getHashTableList(saleTable, i);
 
@@ -219,20 +242,23 @@ void commandOlocQMark(FILE* txt, FILE* svg, HashTable saleTable, double x, doubl
     }
 }
 
+// Comando loc {Pessoa com um tal CPF se muda pra uma oferta ID}
 void commandLoc(FILE* txt, FILE* svg, City city, HashTable personTable, HashTable leasingTable, HashTable residentTable, HashTable saleTable, char* id, char* cpf){
 
     Sale sale = hashTableSearch(saleTable, id);
 
+    // Verifica se a oferta existe e se foi encerrada
     if(sale == NULL){
-        printf("Comando-Loc: Erro! Oferta não encontrada!\n");
+        // printf("Comando-Loc: Erro! Oferta não encontrada!\n");
         return;
     }
 
     if(isSaleLeasing(sale) == -1){
-        printf("Comando-Loc: Erro! Oferta encerrada!\n");
+        // printf("Comando-Loc: Erro! Oferta encerrada!\n");
         return;
     }
 
+    // Se a pessoa ja tinha residencia, ele saí de lá e vai para a oferta
     Resident auxResident = hashTableSearch(residentTable, cpf);
     if(auxResident != NULL){
         char key[50];
@@ -278,11 +304,13 @@ void commandLoc(FILE* txt, FILE* svg, City city, HashTable personTable, HashTabl
 
 }
 
+// Comando loc? {Reporta a situação da oferta ID}
 void commandLocQMark(FILE* txt, FILE* svg, HashTable saleTable, HashTable leasingTable, char* id){
     Sale sale = hashTableSearch(saleTable, id);
 
+    // Verifica se existe oferta, se existe imprime os dados
     if(sale == NULL){
-        printf("Comando Loc?: Erro! Oferta não encontrada!");
+        // printf("Comando Loc?: Erro! Oferta não encontrada!");
         return;
     }
 
@@ -318,9 +346,16 @@ void commandLocQMark(FILE* txt, FILE* svg, HashTable saleTable, HashTable leasin
     }
 }
 
+// Comando dloc {Encerra uma oferta ID}
 void commandDloc(FILE* txt, FILE* svg, HashTable saleTable, HashTable residentTable, HashTable leasingTable, char* id){
     Sale sale = hashTableSearch(saleTable, id);
 
+    // Verifica se existe a oferta
+    if(sale == NULL){
+        return;
+    }
+
+    // Se ela tinha uma pessoa morando, reporta os dados e apaga o morador e a locação
     if(isSaleLeasing(sale) == 1){
         char key[50];
         sprintf(key, "%s/%c/%d", getSaleCep(sale), getSaleSide(sale), getSaleNumber(sale));
@@ -343,7 +378,8 @@ void commandDloc(FILE* txt, FILE* svg, HashTable saleTable, HashTable residentTa
         residentDelete(resident);
         hashTableRemove(residentTable, cpf);
 
-    }else{
+    // Se não só reporta os dados
+    }else if(isSaleLeasing(sale) == 0){
 
         fprintf(txt, "Locação: Id: %s, Cep: %s, Face: %c, Numero: %d, Complemento: %s, Imóvel: Área: %lfm², Preço: %.2lf mensais\n", getSaleId(sale), getSaleCep(sale), getSaleSide(sale), getSaleNumber(sale), getSaleComplement(sale), getSaleAr(sale), getSaleV(sale));
         fprintf(svg,"\t<line x1=\"%lf\" y1=\"%lf\" x2=\"%lf\" y2=\"0\" style=\"stroke:rgb(255,0,0);stroke-width:2\" />\n",getSaleX(sale), getSaleY(sale), getSaleX(sale));
@@ -353,9 +389,10 @@ void commandDloc(FILE* txt, FILE* svg, HashTable saleTable, HashTable residentTa
     setSaleLeasing(sale, -1);
 }
 
+// Comando hom {Reporta os moradores homens em uma área}
 void commandHom(FILE* txt, FILE* svg, HashTable leasingTable, HashTable residentTable, double x, double y, double w, double h){
 
-
+    // Percorre a tabela de moradores
     for(int i = 0; i < getHashTableSize(residentTable); i++){
         List list = getHashTableList(residentTable, i);
 
@@ -369,6 +406,7 @@ void commandHom(FILE* txt, FILE* svg, HashTable leasingTable, HashTable resident
             double xAux = getLeasingX(leasing);
             double yAux = getLeasingY(leasing);
             
+            // Se a coordenada do residente estiver dentro da área e o sexo for masculino imprime os dados
             if(xAux >= x && xAux <= (x+w)){
                 if(yAux >= y && yAux <= (y+h)){
                     Person person = getResidentPerson(resident);
@@ -383,9 +421,10 @@ void commandHom(FILE* txt, FILE* svg, HashTable leasingTable, HashTable resident
 
 }
 
+// Comando mul {Reporta as moradoras mulheres em uma área}
 void commandMul(FILE* txt, FILE* svg, HashTable leasingTable, HashTable residentTable, double x, double y, double w, double h){
 
-
+    // Percorre a tabela de moradores
     for(int i = 0; i < getHashTableSize(residentTable); i++){
         List list = getHashTableList(residentTable, i);
 
@@ -399,6 +438,7 @@ void commandMul(FILE* txt, FILE* svg, HashTable leasingTable, HashTable resident
             double xAux = getLeasingX(leasing);
             double yAux = getLeasingY(leasing);
             
+            // Se estiver na área e o sexo for feminino imprime os dados
             if(xAux >= x && xAux <= (x+w)){
                 if(yAux >= y && yAux <= (y+h)){
                     Person person = getResidentPerson(resident);
@@ -413,6 +453,7 @@ void commandMul(FILE* txt, FILE* svg, HashTable leasingTable, HashTable resident
 
 }
 
+// Função recursiva referente ao catac
 void recCommandCatac(List listBlocks, Node root, double x, double y, double w, double h){
     if(root == NULL){
         return;
@@ -431,22 +472,26 @@ void recCommandCatac(List listBlocks, Node root, double x, double y, double w, d
         double wAux = getBlockWidth(block);
         double hAux = getBlockHeight(block);
 
-        if((xAux + wAux) >= x && xAux <= (x+w)){
-            if((yAux + hAux) >= y && yAux <= (y+h)){
+        // Se a quadra estiver na área adiciona a lista
+        if(xAux >= x && (xAux + wAux) <= (x+w)){
+            if(yAux >= y && (yAux + hAux) <= (y+h)){
                 insertListElement(listBlocks, block);
             }
         }
     }
 }
 
+// Comando catac {Deleta as quadras em uma área e tudo relacionado à elas}
 void commandCatac(FILE* txt, FILE* svg, City city, HashTable leasingTable, HashTable residentTable, HashTable saleTable, double x, double y, double w, double h){
 
     fprintf(svg,"\t<rect id=\"catac\" x=\"%lf\" y=\"%lf\" width=\"%lf\" height=\"%lf\" stroke=\"#AA0044\" fill=\"#AB37C8\" fill-opacity=\"0.5\" stroke-opacity=\"0.5\"/>\n", x, y, w, h);
 
+    // Chama uma função que busca todas as quadras na área 
     List listBlock = createList();
     recCommandCatac(listBlock, getTreeRoot(getCityTree(city)), x, y, w, h);
 
-    for(NodeL nodeAux = getListFirst(listBlock); nodeAux; nodeAux = getListFirst(listBlock)){
+    // Percorre a lista e chama o comando del para cada uma
+    for(NodeL nodeAux = getListFirst(listBlock); nodeAux; nodeAux = getListNext(nodeAux)){
         Block block = getListInfo(nodeAux);
 
         commandDel(txt, svg, city, leasingTable, residentTable, saleTable, getBlockCep(block));
@@ -455,24 +500,19 @@ void commandCatac(FILE* txt, FILE* svg, City city, HashTable leasingTable, HashT
     endList(listBlock);
 }
 
-void commandDmpt(){
-
-}
-
+// Lê e execulta as consultas do .qry
 int readQry(char *pathIn, char* pathOut ,char *nameQry, char *nameGeo, City city, HashTable personTable, HashTable leasingTable, HashTable residentTable){
 
     if(!nameQry){
         return 0;
     }
 
+    // Inicializando valores
     char cep[50], command[30], cpf[50], compl[50], side, id[50], sfx[50];
-
     double x = 0, y = 0, w = 0, h = 0, ar = 0, v = 0;
-
     int num = 0;
 
     char* fullPathQry = catPath(pathIn, nameQry);
-
     FILE *qry = fopen(fullPathQry, "r");
 
     if(qry == NULL){
@@ -481,6 +521,7 @@ int readQry(char *pathIn, char* pathOut ,char *nameQry, char *nameGeo, City city
         return 0;
     }
 
+    // Preparando o .svg e .txt de saída
     char* aux = extractName(nameQry);
     char* fullNameQry = getQryFileName(nameGeo, aux);
     free(aux);
@@ -494,35 +535,37 @@ int readQry(char *pathIn, char* pathOut ,char *nameQry, char *nameGeo, City city
     FILE *txt = getTxtFile(fullNameQry, pathOut);
     FILE *svg = createSvg(fullPathSvg);
 
+    // Tabela de ofertas
     HashTable saleTable = hashTableCreate(1000);
 
     while(!feof(qry)){
         fscanf(qry,"%s",command);
 
+        // Comando "del"
         if(strcmp(command, "del") == 0){
             fscanf(qry, "%s\n", cep);
             fprintf(txt,"del\n");
             commandDel(txt , svg, city, leasingTable, residentTable, saleTable, cep);
 
-
+        // Comando "m?"
         }else if(strcmp(command, "m?") == 0){
             fscanf(qry, "%s\n", cep);
             fprintf(txt, "m?\n");
             commandMQMark(txt, city, residentTable, cep);
 
-
+        // Comando "dm?"
         }else if(strcmp(command, "dm?") == 0){
             fscanf(qry, "%s\n", cpf);
             fprintf(txt, "dm?\n");
             commandDMQMark(txt, svg, residentTable, leasingTable, cpf);
 
-
+        // Comando "mud"
         }else if(strcmp(command, "mud") == 0){
             fscanf(qry, "%s %s %c %d %s\n", cpf, cep, &side, &num, compl);
             fprintf(txt, "mud\n");
             commandMud(txt, svg, city, residentTable, leasingTable, cpf, cep, side, num, compl);
 
-
+        // Comando "oloc"
         }else if(strcmp(command, "oloc") == 0){
             fscanf(qry, "%s %s %c %d %s %lf %lf\n", id, cep, &side, &num, compl, &ar, &v);
             Sale sale = saleCreate(getCityHashTable(city), id, cep, side, num, compl, ar, v);
@@ -534,63 +577,64 @@ int readQry(char *pathIn, char* pathOut ,char *nameQry, char *nameGeo, City city
 
             }
 
-
+        // Comando "oloc?"
         }else if((strcmp(command, "oloc?") == 0)){
             fscanf(qry, "%lf %lf %lf %lf\n", &x, &y, &w, &h);
             fprintf(txt, "oloc?\n");
             commandOlocQMark(txt, svg, saleTable, x, y, w, h);
 
-
+        // Comando "loc"
         }else if((strcmp(command, "loc") == 0)){
             fscanf(qry, "%s %s\n", id, cpf);
             fprintf(txt, "loc\n");
             commandLoc(txt, svg, city, personTable, leasingTable, residentTable, saleTable, id, cpf);
 
-
+        // Comando "loc?"
         }else if((strcmp(command, "loc?") == 0)){
             fscanf(qry, "%s\n", id);
             fprintf(txt, "loc?\n");
             commandLocQMark(txt, svg, saleTable, leasingTable, id);
 
-
+        // Comando "dloc"
         }else if((strcmp(command, "dloc") == 0)){
             fscanf(qry, "%s\n", id);
             fprintf(txt, "dloc\n");
             commandDloc(txt, svg, saleTable, residentTable, leasingTable, id);
 
-
-
+        // Comando "hom"
         }else if((strcmp(command, "hom") == 0)){
             fscanf(qry, "%lf %lf %lf %lf\n", &x, &y, &w, &h);
             fprintf(txt, "hom\n");
             commandHom(txt, svg, leasingTable, residentTable, x, y, w, h);
 
-
+        // Comando "mul"
         }else if((strcmp(command, "mul") == 0)){
             fscanf(qry, "%lf %lf %lf %lf\n", &x, &y, &w, &h);
             fprintf(txt, "mul\n");
             commandMul(txt, svg, leasingTable, residentTable, x, y, w, h);
 
-
+        // Comando "dmpt"
         }else if((strcmp(command, "dmpt") == 0)){
             fscanf(qry, "%s\n", sfx);
             drawDotFile(pathOut, nameGeo, sfx, getCityTree(city));
 
-
+        // Comando "catac"
         }else if((strcmp(command, "catac") == 0)){
             fscanf(qry, "%lf %lf %lf %lf\n", &x, &y, &w, &h);
             fprintf(txt, "catac\n");
             commandCatac(txt, svg, city, leasingTable, residentTable, saleTable, x, y, w, h);
 
-
         }
     }
+    // Desenhando as quadras no .svg
     drawBlocks(svg, getCityTree(city));
 
 
+    // Desalocando todas as ofertas e sua tabela
     saleDeleteAll(saleTable);
     hashTableEnd(saleTable);
 
+    // Desalocando valores
     endSvg(svg);
     fclose(txt);
     free(fullNameQry);

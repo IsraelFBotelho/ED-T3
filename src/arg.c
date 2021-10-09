@@ -3,6 +3,7 @@
 #include <string.h>
 #include "arg.h"
 
+// Le os parametros de linha de comando e armazena os comandos passados
 void readArg(int argc, char** argv, char** pathOut, char** pathIn, char** nameArqGeo, char** nameArqQry, char** nameArqPm){
 
     int i = 1;
@@ -36,6 +37,7 @@ void readArg(int argc, char** argv, char** pathOut, char** pathIn, char** nameAr
         i++;
         }
 
+        // O programa não pode rodar sem um .geo
         if(!*pathOut || !*nameArqGeo){
             printf("Caminho de saida e/ou nome do arquivo .geo nao encontrado!\n");
             exit(1);

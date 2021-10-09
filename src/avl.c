@@ -182,7 +182,7 @@ NodeStruct* searchBigger(NodeStruct* this){
     return node1;
 }
 
-// 
+// Correge o X máximo e mínimo
 int recChangeBiggerLesser(NodeStruct* root){
 
     if(root == NULL){
@@ -263,6 +263,7 @@ int recTreeInsert(NodeStruct** root, Info info, double keyX, double keyY, double
                 }
             }
         }else{
+            // Caso o X seja igual, ele adiciona na lista do nó correspondente
             Item* item = malloc(sizeof(Item));
             item->info = info;
             item->keyX = keyX;
@@ -272,6 +273,7 @@ int recTreeInsert(NodeStruct** root, Info info, double keyX, double keyY, double
         }
     }
 
+    // Atualiza a altura do nó para balancear!
     this->height = biggest(nodeHeight(this->left), nodeHeight(this->right)) + 1;
 
     return res;
@@ -283,6 +285,7 @@ int treeInsert(Tree tree, Info info, double keyX, double keyY, double width){
     int aux = recTreeInsert(&(treeAux->root), info, keyX, keyY, width);
 
     if(aux == 1){
+        // Se a inserção foi bem sucessida, verifica atualiza os mínimos e máximos
         recChangeBiggerLesser(treeAux->root);
         treeAux->size++;
     }
@@ -297,8 +300,6 @@ int recTreeRemove(NodeStruct** root, double keyX, double keyY){
     if(*root == NULL){
         return 0;
     }
-
-    printf("%lf %lf\n", keyX, keyY);
 
     // Se for menor que o nó atual vai para a esquerda e balanceia se precisar
     if(keyX < (*root)->key){
@@ -326,7 +327,8 @@ int recTreeRemove(NodeStruct** root, double keyX, double keyY){
         }
     }
 
-    if(keyX == (*root)->key && (getListSize((*root)->list) > 0 && keyY != FLAG_STOP_REMOVE)){
+    // Se for igual e a lista tem mais de um elemento remove da lista
+    if(keyX == (*root)->key && (getListSize((*root)->list) > 1 && keyY != FLAG_STOP_REMOVE)){
         for(NodeL nodeAux = getListFirst((*root)->list); nodeAux; nodeAux = getListNext(nodeAux)){
             Item* item = (Item* ) getListInfo(nodeAux);
             if(keyY == item->keyY){
@@ -337,8 +339,8 @@ int recTreeRemove(NodeStruct** root, double keyX, double keyY){
         }
     }
 
-    // Se for igual ao valor do nó o remove e balanceia se precisar
-    if((keyX == (*root)->key && getListSize((*root)->list) == 0) || (keyX == (*root)->key && keyY == FLAG_STOP_REMOVE)){
+    // Se for igual ao valor do nó e unico elemento ou é pra substituir outro nó na recursão, remove e balanceia
+    if((keyX == (*root)->key && getListSize((*root)->list) == 1) || (keyX == (*root)->key && keyY == FLAG_STOP_REMOVE)){
             if((*root)->left == NULL || (*root)->right == NULL){
                 NodeStruct* oldNode = (*root);
                 if((*root)->left != NULL){
@@ -356,7 +358,7 @@ int recTreeRemove(NodeStruct** root, double keyX, double keyY){
                 (*root)->key = temp->key;
                 NodeStruct* big = searchBigger((*root)->right);
                 NodeStruct* small = searchLesser((*root)->left);
-                (*root)->biggerX = big != NULL? big->key + big->widthBlock: (*root)->key + (*root)->widthBlock;
+                (*root)->biggerX = big != NULL? big->key + big->widthBlock : (*root)->key + (*root)->widthBlock;
                 (*root)->lesserX = small != NULL? small->key : (*root)->key;
 
                 recTreeRemove(&(*root)->right, (*root)->key, FLAG_STOP_REMOVE);
@@ -465,42 +467,49 @@ List getTreeNodeItens(Node root){
     return rootAux->list;
 }
 
+// Retorna o Info do Item da lista no nó
 Info getTreeListItem(Info item){
     Item* itemAux = (Item* ) item;
 
     return itemAux->info;
 }
 
+// Retorna a chave do Item da lista no nó
 double getTreeListKeyY(Info item){
     Item* itemAux = (Item* ) item;
 
     return itemAux->keyY;
 }
 
+// Renorna o x Máximo
 double getTreeBiggerX(Node root){
     NodeStruct* rootAux = (NodeStruct* ) root;
 
     return rootAux->biggerX;
 }
 
+// Retorna o X Mínimo
 double getTreeLesserX(Node root){
     NodeStruct* rootAux = (NodeStruct* ) root;
 
     return rootAux->lesserX;
 }
 
+// Retorna o tamanho da árvore
 int getTreeSize(Tree tree){
     TreeStruct* treeAux = (TreeStruct* ) tree;
 
     return treeAux->size;
 }
 
+// Retorna a chave da árvore
 double getTreeKey(Node root){
     NodeStruct* rootAux = (NodeStruct* ) root;
 
     return rootAux->key;
 }
 
+// Retorna a altura do nó da árvore
 int getTreeHeight(Node root){
     NodeStruct* rootAux = (NodeStruct* ) root;
 

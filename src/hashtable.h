@@ -48,14 +48,24 @@ Pós: Retorna um void* com a lista.
 List getHashTableList(HashTable table, int index);
 
 /*
-Função: Retorna o tamanho da tabela de espalhamento
+Função: Retorna o tamanho da tabela de espalhamento;
 Pré: Um void* com a tabela;
 Pós: Retorna um int com o tamanho.
 */
 int getHashTableSize(HashTable table);
 
+/*
+Função: Retorna o Info dentro do Item da tabela da espalhamento;
+Pré: Um void* com a tabela;
+Pós: Retorna um void* com o info.
+*/
 Info getHashTableListItem(Info item);
 
+/*
+Função: Retorna a chave dentro do Item da tabela da espalhamento;
+Pré: Um void* com a tabela;
+Pós: Retorna um char* com a chave.
+*/
 char* getHashTableListKey(Info item);
 
 #endif

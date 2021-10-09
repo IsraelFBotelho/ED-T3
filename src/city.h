@@ -30,6 +30,9 @@ Pós: Retorna um int caso bem sucedido ou 0 para falha.
 int cityInsert(City city, Info info, double keyX, double keyY, double width, char* keyHash);
 
 /*
+Função: Apaga uma quadra da cidade pelo Cep;
+Pré: Um void* com o endereço da cidade, um char* com o Cep;
+Pós: Retorna 1 se sucesso ou 0 para falha.
 */
 int cityRemovebyCep(City city, char* cep);
 

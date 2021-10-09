@@ -58,6 +58,20 @@ Pós: Retorna um char* com o complemento.
 char* getLeasingComplement(Leasing leasing);
 
 /*
+Função: Retorna a posição X de uma locação;
+Pré: Um void* de uma locação;
+Pós: Retorna um double com valor.
+*/
+double getLeasingX(Leasing leasing);
+
+/*
+Função: Retorna a posição Y de uma locação;
+Pré: Um void* de uma locação;
+Pós: Retorna um double com valor.
+*/
+double getLeasingY(Leasing leasing);
+
+/*
 Função: Retorna o morador de uma locação;
 Pré: Um void* de uma locação;
 Pós: Retorna um void* com o morador.
@@ -70,9 +84,5 @@ Pré: Um void* de uma locação, um void* de um morador;
 Pós: Retorna 1 se sucesso ou 0 para falha.
 */
 int setLeasingResident(Leasing leasing, Resident resident);
-
-double getLeasingX(Leasing leasing);
-
-double getLeasingY(Leasing leasing);
 
 #endif

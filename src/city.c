@@ -52,6 +52,7 @@ int cityInsert(City city, Info info, double keyX, double keyY, double width, cha
     return tree == 0 || table == 0 ? 0 : 1;
 }
 
+// Remove uma quadra da cidade pelo Cep
 int cityRemovebyCep(City city, char* cep){
     CityStruct* cityAux = (CityStruct* ) city;
 
@@ -60,13 +61,15 @@ int cityRemovebyCep(City city, char* cep){
     }
 
     Block block = hashTableSearch(cityAux->table, cep);
-    printf("%d\n", block == NULL);
+
     double x = getBlockX(block);
     double y = getBlockY(block);
 
+    // Apaga da árvore e da tabela
     int tree = treeRemove(cityAux->tree, x, y);
     int table = hashTableRemove(cityAux->table, cep);
 
+    // Apaga a quadra
     blockDelete(block);
     return tree == 0 || table == 0 ? 0 : 1;
 }

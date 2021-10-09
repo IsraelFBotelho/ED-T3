@@ -66,24 +66,59 @@ Pós: Retorna void* com o nó.
 Node getTreeRoot(Tree tree);
 
 /*
-Função: Busca e recupera uma lista com todos os dados do nó;
+Função: Retorna a lista com todos os dados do nó;
 Pré: void* para o nó;
-Pós: Retorna void* com a info se existir ou NULL caso não encontre.
+Pós: Retorna void* com a lista.
 */
 List getTreeNodeItens(Node root);
 
+/*
+Função: Retorna o Info de um Item;
+Pré: void* para o item;
+Pós: Retorna void* com a info.
+*/
 Info getTreeListItem(Info item);
 
+/*
+Função: Retorna o Y de um Item;
+Pré: void* para o Item;
+Pós: Retorna double com o valor.
+*/
 double getTreeListKeyY(Info item);
 
+/*
+Função: Retorna o X máximo de um nó da árvore;
+Pré: void* para o nó;
+Pós: Retorna um double com valor.
+*/
 double getTreeBiggerX(Node root);
 
+/*
+Função: Retorna o X mínimo de um nó da árvore;
+Pré: void* para o nó;
+Pós: Retorna um double com valor.
+*/
 double getTreeLesserX(Node root);
 
+/*
+Função: Retorna o tamanho de uma árvore;
+Pré: void* para uma estrutura e árvore;
+Pós: Retorna int com valor.
+*/
 int getTreeSize(Tree tree);
 
+/*
+Função: Retorna a chave de um nó da árvore;
+Pré: void* para o nó;
+Pós: Retorna double com valor.
+*/
 double getTreeKey(Node root);
 
+/*
+Função: Retorna a altura do nó da árvore;
+Pré: void* para o nó;
+Pós: Retorna int com valor.
+*/
 int getTreeHeight(Node root);
 
 #endif

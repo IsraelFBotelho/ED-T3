@@ -22,6 +22,7 @@ typedef struct saleStruct{
 
 }SaleStruct;
 
+// Cria e retorna uma estrutura de oferta
 Sale saleCreate(HashTable table, char* id, char* cep, char side, int num, char* complement, double ar, double v){
     SaleStruct* new = (SaleStruct* ) malloc(sizeof(SaleStruct));
 
@@ -41,6 +42,7 @@ Sale saleCreate(HashTable table, char* id, char* cep, char side, int num, char* 
         return NULL;
     }
 
+    // Calcula a posição da oferta conforme a face da quadra
     if(side == 'S'){
         new->y = getBlockY(block) + (num/2);
         new->x = getBlockX(block) + num;
@@ -58,6 +60,7 @@ Sale saleCreate(HashTable table, char* id, char* cep, char side, int num, char* 
     return new;
 }
 
+// Deleta uma estrutura de oferta
 int saleDelete(Sale sale){
     SaleStruct* saleAux = (SaleStruct* ) sale;
 
@@ -69,6 +72,7 @@ int saleDelete(Sale sale){
     return 1;
 }
 
+// Deleta todas as ofertas em uma tabela
 int saleDeleteAll(HashTable table){
     if(table == NULL){
         return 0;
@@ -81,7 +85,7 @@ int saleDeleteAll(HashTable table){
             continue;
         }
 
-        // Segundo for acessa o morador da lista
+        // Segundo for acessa a oferta da lista
         for(NodeL nodeAux = getListFirst(list); nodeAux; nodeAux = getListNext(nodeAux)){
             SaleStruct* saleAux = (SaleStruct* ) getHashTableListItem(getListInfo(nodeAux));
             if(saleAux != NULL){
@@ -94,60 +98,70 @@ int saleDeleteAll(HashTable table){
     return 1;
 }
 
+// Retorna o Id de uma oferta
 char* getSaleId(Sale sale){
     SaleStruct* saleAux = (SaleStruct* ) sale;
 
     return saleAux->id;
 }
 
+// Retorna o Cep de uma oferta
 char* getSaleCep(Sale sale){
     SaleStruct* saleAux = (SaleStruct* ) sale;
 
     return saleAux->cep;
 }
 
+// Retorna a face de uma oferta
 char getSaleSide(Sale sale){
     SaleStruct* saleAux = (SaleStruct* ) sale;
 
     return saleAux->side;
 }
 
+// Retorna o número de uma oferta
 int getSaleNumber(Sale sale){
     SaleStruct* saleAux = (SaleStruct* ) sale;
 
     return saleAux->num;
 }
 
+// Retorna o complemento de uma oferta
 char* getSaleComplement(Sale sale){
     SaleStruct* saleAux = (SaleStruct* ) sale;
 
     return saleAux->complement;
 }
 
+// Retorna a área de uma oferta
 double getSaleAr(Sale sale){
     SaleStruct* saleAux = (SaleStruct* ) sale;
 
     return saleAux->ar;
 }
 
+// Retorna o valor de uma oferta
 double getSaleV(Sale sale){
     SaleStruct* saleAux = (SaleStruct* ) sale;
 
     return saleAux->v;
 }
 
+// Retorna a posição X de uma oferta
 double getSaleX(Sale sale){
     SaleStruct* saleAux = (SaleStruct* ) sale;
 
     return saleAux->x;
 }
 
+// Retorn a posição Y de uma oferta
 double getSaleY(Sale sale){
     SaleStruct* saleAux = (SaleStruct* ) sale;
 
     return saleAux->y;
 }
 
+// Substitui o estado de uma oferta
 int setSaleLeasing(Sale sale, int sw){
     SaleStruct* saleAux = (SaleStruct* ) sale;
 
@@ -156,6 +170,7 @@ int setSaleLeasing(Sale sale, int sw){
     return sw;
 }
 
+// Verifica o estado de uma oferta
 int isSaleLeasing(Sale sale){
     SaleStruct* saleAux = (SaleStruct* ) sale;
 

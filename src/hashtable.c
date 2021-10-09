@@ -146,7 +146,7 @@ Info hashTableSearch(HashTable table, char key[50]){
     return NULL;
 }
 
-// Gera e retorna uma tabela com todos os void* fora de seus respectivos itens
+// Retorna a listacom todos os itens
 List getHashTableList(HashTable table, int index){
     HashTableStruct* tableAux = (HashTableStruct* ) table;
 
@@ -168,12 +168,14 @@ int getHashTableSize(HashTable table){
     return tableAux->size; 
 }
 
+// Retorna o Info de um item da tabela de espalhamento
 Info getHashTableListItem(Info item){
     Item* itemAux = (Item* ) item;
 
     return itemAux->info;
 }
 
+// Retorna a chave de um item da tabela e espalhamento
 char* getHashTableListKey(Info item){
     Item* itemAux = (Item* ) item;
 

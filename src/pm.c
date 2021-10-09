@@ -8,12 +8,14 @@
 #include "leasing.h"
 #include "resident.h"
 
+// Leitura do arquivo .pm
 void readPm(char* path, char* name, City city, HashTable* personTable, HashTable* leasingTable, HashTable* residentTable){
 
     if(name == NULL){
         return;
     }
 
+    // Inicialização de valores
     int n = 9999, day, month, year, number;
     char cpf[50], personName[50], surname[50], gender, cep[50], side, complement[50];
     char command[30];
@@ -37,7 +39,7 @@ void readPm(char* path, char* name, City city, HashTable* personTable, HashTable
 
     rewind(pm);
 
-    // printf("Arquivo: %s\nCaminho: %s\n", name, path);
+    // Criando as tabelas para as pessoas, moradores e locações
     *personTable = hashTableCreate(n);
     *leasingTable = hashTableCreate(n);
     *residentTable = hashTableCreate(n);
@@ -46,12 +48,14 @@ void readPm(char* path, char* name, City city, HashTable* personTable, HashTable
 
         fscanf(pm,"%s", command);
 
+        // Comando "p"
         if(strcmp(command, "p") == 0){
             fscanf(pm, "%s %s %s %c %d/%d/%d \n", cpf, personName, surname, &gender, &day, &month, &year);
             Person person = personCreate(personName, surname, cpf, gender, day, month, year);
             hashTableInsert((*personTable), cpf, person);
-            // printf("%d %d %d \n", day, month, year);
 
+
+        // Comando "m"
         }else if(strcmp(command, "m") == 0){
             fscanf(pm, "%s %s %c %d %s\n", cpf, cep, &side, &number, complement);
             Leasing leasing = leasingCreate(getCityHashTable(city), cep, side, number, complement);

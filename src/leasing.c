@@ -36,6 +36,7 @@ Leasing leasingCreate(HashTable table, char* cep, char side, int num, char* comp
         return NULL;
     }
 
+    // Calcula a posição da locação conforme o lado da quadra
     if(side == 'S'){
         new->y = getBlockY(new->block) + (num/2);
         new->x = getBlockX(new->block) + num;

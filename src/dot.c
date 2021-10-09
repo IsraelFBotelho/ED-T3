@@ -4,6 +4,7 @@
 #include "dot.h"
 #include "path.h"
 
+// Insere o sulfixo no nome do arquivo
 char* getDotFileName(char* fullNameGeo, char* suffix){
     char* nameGeo = extractName(fullNameGeo);
     char* fullName = malloc((strlen(nameGeo) + strlen(suffix) + 2) *sizeof(char));
@@ -13,6 +14,7 @@ char* getDotFileName(char* fullNameGeo, char* suffix){
     return fullName;
 }
 
+// Cria um arquivo .dot e escreve as forma como os nós ficam
 FILE* createDot(char* fullPathDot, char* sufix, int size){
     FILE* dot = fopen(fullPathDot, "w");
 
@@ -29,6 +31,7 @@ FILE* createDot(char* fullPathDot, char* sufix, int size){
     return dot;
 }
 
+// Finaliza um arquivo .dot
 void endDot(FILE* dot){
     if(!dot){
         printf("Erro na finalizacao do .dot!!\n");
@@ -39,6 +42,7 @@ void endDot(FILE* dot){
     fclose(dot);
 }
 
+// Desenha de forma recursiva os nós no arquivo escrevendo as informações no mesmo
 void recDrawNodes(FILE* dot, Node root){
 
     if(root == NULL){
@@ -50,16 +54,10 @@ void recDrawNodes(FILE* dot, Node root){
 
     double keyThis = getTreeKey(root);
 
-    // List list;
-    // int height;
-    // struct node* left;
-    // struct node* right;
-    // double key;
-    // double lesserX;
-    // double biggerX;
+    // Imprime as informações do nó
+    fprintf(dot, "\t\"%lf\" [label=\"X:%.2lf\\nAltura Do Nó:%d\\nX Máximo:%.2lf\\nX Mínimo:%.2lf\\n\"];\n", keyThis, getTreeKey(root), getTreeHeight(root), getTreeBiggerX(root), getTreeLesserX(root));
 
-    fprintf(dot, "\t\"%lf\" [label=\"X:%.2lf\\nAltura Do Nó:%d\\nX Máximo:%.2lf\\nX Mínimo:%.2lf\\n\"];", keyThis, getTreeKey(root), getTreeHeight(root), getTreeBiggerX(root), getTreeLesserX(root));
-
+    // Caso Tenha filhos
     if(left != NULL){
         double keyLeft = getTreeKey(left);
         fprintf(dot, "\t\"%lf\" -> \"%lf\";\n", keyThis, keyLeft);
@@ -80,6 +78,7 @@ void recDrawNodes(FILE* dot, Node root){
 
 }
 
+// Cria, desenha e finaliza um arquivo .dot
 int drawDotFile(char* pathOut, char* nameArq, char* sufix, Tree tree){
 
 

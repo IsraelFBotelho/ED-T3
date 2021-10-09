@@ -15,6 +15,7 @@ typedef struct residentStruct{
 
 }ResidentStruct;
 
+// Cria uma estrutura de morador e retorna
 Resident residentCreate(char* cpf, char* cep, char side, int num, char* complement, Person person, int isRent){
     ResidentStruct* new = (ResidentStruct* ) malloc(sizeof(ResidentStruct));
     
@@ -30,6 +31,7 @@ Resident residentCreate(char* cpf, char* cep, char side, int num, char* compleme
     return new;
 }
 
+// Deleta uma estrutura de morador
 int residentDelete(Resident resident){
     ResidentStruct* residentAux = (ResidentStruct* ) resident;
 
@@ -41,6 +43,7 @@ int residentDelete(Resident resident){
     return 1;
 }
 
+// Percorre uma tabela e deleta todos os moradores que encontrar
 int residentDeleteAll(HashTable table){
     if(table == NULL){
         return 0;
@@ -66,42 +69,49 @@ int residentDeleteAll(HashTable table){
     return 1;
 }
 
+// Retorna o Cep do morador
 char* getResidentCep(Resident resident){
     ResidentStruct* residentAux = (ResidentStruct* ) resident;
 
     return residentAux->cep;
 }
 
+// Retorna o Cpf do morador
 char* getResidentCpf(Resident resident){
     ResidentStruct* residentAux = (ResidentStruct* ) resident;
 
     return residentAux->cpf;
 }
 
+// Retorna a Face do morador
 char getResidentSide(Resident resident){
     ResidentStruct* residentAux = (ResidentStruct* ) resident;
 
     return residentAux->side;
 }
 
+// Retorna o numero do morador
 int getResidentNumber(Resident resident){
     ResidentStruct* residentAux = (ResidentStruct* ) resident;
 
     return residentAux->num;
 }
 
+// Retorna o complemento do morador
 char* getResidentComplement(Resident resident){
     ResidentStruct* residentAux = (ResidentStruct* ) resident;
 
     return residentAux->complement;
 }
 
+// Retorna a pessoa referente ao morador
 Person getResidentPerson(Resident resident){
     ResidentStruct* residentAux = (ResidentStruct* ) resident;
 
     return residentAux->person;
 }
 
+// Retorna se o morador paga aluguel
 int isResidentRent(Resident resident){
     ResidentStruct* residentAux = (ResidentStruct* ) resident;
 
