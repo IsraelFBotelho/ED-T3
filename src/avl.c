@@ -169,7 +169,7 @@ int recTreeInsert(NodeStruct** root, Info info, double keyX, double keyY, double
         new->right = NULL;
         new->height = 0;
         new->key = keyX;
-        new->biggerX = keyX + width;
+        new->biggerX = keyX;
         new->lesserX = keyX;
         *root = new;
         return 1;
@@ -179,8 +179,8 @@ int recTreeInsert(NodeStruct** root, Info info, double keyX, double keyY, double
 
 
     // Enquanto for passando pelos nós atualiza o maior e menor :)
-    if(this->biggerX < keyX + width){
-        this->biggerX = keyX + width;
+    if(this->biggerX < keyX){
+        this->biggerX = keyX;
     }
     if(this->lesserX > keyX){
         this->lesserX = keyX;
@@ -466,4 +466,22 @@ double getTreeLesserX(Node root){
     NodeStruct* rootAux = (NodeStruct* ) root;
 
     return rootAux->lesserX;
+}
+
+int getTreeSize(Tree tree){
+    TreeStruct* treeAux = (TreeStruct* ) tree;
+
+    return treeAux->size;
+}
+
+double getTreeKey(Node root){
+    NodeStruct* rootAux = (NodeStruct* ) root;
+
+    return rootAux->key;
+}
+
+int getTreeHeight(Node root){
+    NodeStruct* rootAux = (NodeStruct* ) root;
+
+    return rootAux->height;
 }

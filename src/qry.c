@@ -9,6 +9,7 @@
 #include "svg.h"
 #include "resident.h"
 #include "sale.h"
+#include "dot.h"
 
 FILE *getTxtFile(char* nameArq, char* pathOut){
     char t[] = "txt";
@@ -573,7 +574,7 @@ int readQry(char *pathIn, char* pathOut ,char *nameQry, char *nameGeo, City city
 
         }else if((strcmp(command, "dmpt") == 0)){
             fscanf(qry, "%s\n", sfx);
-
+            drawDotFile(pathOut, nameGeo, sfx, getCityTree(city));
 
 
         }else if((strcmp(command, "catac") == 0)){

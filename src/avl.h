@@ -80,4 +80,10 @@ double getTreeBiggerX(Node root);
 
 double getTreeLesserX(Node root);
 
+int getTreeSize(Tree tree);
+
+double getTreeKey(Node root);
+
+int getTreeHeight(Node root);
+
 #endif
