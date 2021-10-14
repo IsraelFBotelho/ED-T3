@@ -349,6 +349,7 @@ int recTreeRemove(NodeStruct** root, double keyX, double keyY){
                     (*root) = (*root)->right;
                 }
             
+                endList(oldNode->list);
                 free(oldNode);
             }else{
                 NodeStruct* temp = searchLesser((*root)->right);
