@@ -3,6 +3,7 @@
 #include <string.h>
 #include "dot.h"
 #include "path.h"
+#include "block.h"
 
 // Insere o sulfixo no nome do arquivo
 char* getDotFileName(char* fullNameGeo, char* suffix){
@@ -15,7 +16,7 @@ char* getDotFileName(char* fullNameGeo, char* suffix){
 }
 
 // Cria um arquivo .dot e escreve as forma como os nós ficam
-FILE* createDot(char* fullPathDot, char* sufix, int size){
+FILE* createDot(char* fullPathDot, int size){
     FILE* dot = fopen(fullPathDot, "w");
 
     if(!dot){
@@ -24,7 +25,7 @@ FILE* createDot(char* fullPathDot, char* sufix, int size){
         exit(1);
     }
 
-    fprintf(dot ,"digraph %s {\n", sufix);
+    fprintf(dot ,"digraph israelBotelho {\n");
     fprintf(dot, "\tsize=\"%d\";\n", size);
     fprintf(dot, "\tnode [color=lightblue, style=filled];\n");
 
@@ -55,7 +56,20 @@ void recDrawNodes(FILE* dot, Node root){
     double keyThis = getTreeKey(root);
 
     // Imprime as informações do nó
-    fprintf(dot, "\t\"%lf\" [label=\"X:%.2lf\\nAltura Do Nó:%d\\nX Máximo:%.2lf\\nX Mínimo:%.2lf\\n\"];\n", keyThis, getTreeKey(root), getTreeHeight(root), getTreeBiggerX(root), getTreeLesserX(root));
+    if(getListSize(getTreeNodeItens(root)) > 2){
+        NodeL nodeAux = getListFirst(getTreeNodeItens(root));
+        char* cep1 = getBlockCep(getTreeListItem(getListInfo(nodeAux)));
+        nodeAux = getListNext(nodeAux);
+        char* cep2 = getBlockCep(getTreeListItem(getListInfo(nodeAux)));
+
+        fprintf(dot, "\t\"%lf\" [label=\"X:%.2lf\\nAltura Do Nó:%d\\nCep:%s\\nCep:%s\\n...\\nX Máximo:%.2lf\\nX Mínimo:%.2lf\\n\"];\n", keyThis, getTreeKey(root), getTreeHeight(root), cep1, cep2, getTreeBiggerX(root), getTreeLesserX(root));
+    }else{
+        NodeL nodeAux = getListFirst(getTreeNodeItens(root));
+        char* cep1 = getBlockCep(getTreeListItem(getListInfo(nodeAux)));
+
+        fprintf(dot, "\t\"%lf\" [label=\"X:%.2lf\\nAltura Do Nó:%d\\nCep:%s\\nX Máximo:%.2lf\\nX Mínimo:%.2lf\\n\"];\n", keyThis, getTreeKey(root), getTreeHeight(root), cep1, getTreeBiggerX(root), getTreeLesserX(root));
+    }
+
 
     // Caso Tenha filhos
     if(left != NULL){
@@ -91,7 +105,7 @@ int drawDotFile(char* pathOut, char* nameArq, char* sufix, Tree tree){
     char* fullPathDot = catPath(pathOut, nameArqDot);
 
     // Criando o .dot
-    FILE* dot = createDot(fullPathDot, sufix, getTreeSize(tree));
+    FILE* dot = createDot(fullPathDot, getTreeSize(tree));
 
     // Função que vai desenhando no dot
     recDrawNodes(dot, getTreeRoot(tree));

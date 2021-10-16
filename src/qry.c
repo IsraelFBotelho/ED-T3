@@ -48,6 +48,11 @@ char *getQryFileName(char* fullNameGeo, char* nameQry){
 
 // Comando del {Deleta uma quadra a partir do seu CEP e tudo relacionado a ela}
 void commandDel(FILE* txt, FILE* svg, City city, HashTable leasingTable, HashTable residentTable, HashTable saleTable, char* cep){
+    Block block = hashTableSearch(getCityHashTable(city), cep);
+
+    if(block == NULL){
+        return;
+    }
     
     // Deleta as locações que estão no CEP
     for(int i = 0; i < getHashTableSize(leasingTable); i++){
@@ -59,7 +64,7 @@ void commandDel(FILE* txt, FILE* svg, City city, HashTable leasingTable, HashTab
 
                 fprintf(txt, "Locação: Cep: %s, Face: %c, Numero: %d, Complemento: %s\n",getLeasingCep(leasing), getLeasingSide(leasing), getLeasingNum(leasing), getLeasingComplement(leasing));
                 char key[50];
-                sprintf(key, "%s/%c/%d", getLeasingCep(leasing), getLeasingSide(leasing), getLeasingNum(leasing));
+                sprintf(key, "%s/%c/%d/%s", getLeasingCep(leasing), getLeasingSide(leasing), getLeasingNum(leasing), getLeasingComplement(leasing));
 
                 // Deleta os moradores da locação
                 Resident resident = getLeasingResident(leasing);
@@ -100,7 +105,6 @@ void commandDel(FILE* txt, FILE* svg, City city, HashTable leasingTable, HashTab
 
     // Deleta a quadra
     double x, y;
-    Block block = hashTableSearch(getCityHashTable(city), cep);
     x = getBlockX(block) + (getBlockWidth(block) / 2);
     y = getBlockY(block) + (getBlockHeight(block) / 2);
     fprintf(svg, "\t<line x1=\"%lf\" y1=\"%lf\" x2=\"%lf\" y2=\"0\" style=\"stroke:rgb(255,0,0);stroke-width:2\"/>\n",x, y, x);
@@ -148,7 +152,7 @@ void commandDMQMark(FILE* txt, FILE* svg, HashTable residentTable, HashTable lea
 
     // Com as informações do morador se acha sua locação e imprime tudo relacionado aos dois
     char key[50];
-    sprintf(key, "%s/%c/%d", getResidentCep(resident), getResidentSide(resident), getResidentNumber(resident));
+    sprintf(key, "%s/%c/%d/%s", getResidentCep(resident), getResidentSide(resident), getResidentNumber(resident), getResidentComplement(resident));
     Leasing leasing = hashTableSearch(leasingTable, key);
     Person person = getResidentPerson(resident);
     fprintf(svg, "\t<line x1=\"%lf\" y1=\"%lf\" x2=\"%lf\" y2=\"0\" style=\"stroke:rgb(255,0,0);stroke-width:2\" />\n", getLeasingX(leasing), getLeasingY(leasing), getLeasingX(leasing));
@@ -177,7 +181,7 @@ void commandMud(FILE* txt, FILE* svg, City city, HashTable residentTable, HashTa
     
     // Encontra a locação atual da pessoa, reporta os dados e apaga o morador
     char key[50];
-    sprintf(key, "%s/%c/%d", getResidentCep(resident), getResidentSide(resident), getResidentNumber(resident));
+    sprintf(key, "%s/%c/%d/%s", getResidentCep(resident), getResidentSide(resident), getResidentNumber(resident), getResidentComplement(resident));
     Leasing leasing = hashTableSearch(leasingTable, key);
 
     double x1 = getLeasingX(leasing);
@@ -196,7 +200,7 @@ void commandMud(FILE* txt, FILE* svg, City city, HashTable residentTable, HashTa
 
     fprintf(txt, "Novo Endereço: Cep: %s, Face: %c, Numero: %d, Complemento: %s\n", cep, side, num, complement);
 
-    sprintf(key, "%s/%c/%d", cep, side, num);
+    sprintf(key, "%s/%c/%d/%s", cep, side, num, complement);
     leasing = hashTableSearch(leasingTable, key);
 
     if(leasing != NULL){
@@ -262,7 +266,7 @@ void commandLoc(FILE* txt, FILE* svg, City city, HashTable personTable, HashTabl
     Resident auxResident = hashTableSearch(residentTable, cpf);
     if(auxResident != NULL){
         char key[50];
-        sprintf(key, "%s/%c/%d", getResidentCep(auxResident), getResidentSide(auxResident), getResidentNumber(auxResident));
+        sprintf(key, "%s/%c/%d/%s", getResidentCep(auxResident), getResidentSide(auxResident), getResidentNumber(auxResident), getResidentComplement(auxResident));
         Leasing auxLeasing = hashTableSearch(leasingTable, key);
         setLeasingResident(auxLeasing, NULL);
         residentDelete(auxResident);
@@ -283,7 +287,7 @@ void commandLoc(FILE* txt, FILE* svg, City city, HashTable personTable, HashTabl
 
         if(person != NULL){
             char key[100];
-            sprintf(key, "%s/%c/%d", cep, side, number);
+            sprintf(key, "%s/%c/%d/%s", cep, side, number, complement);
             hashTableInsert(leasingTable, key, leasing);
             Resident resident = residentCreate(cpf, cep, side, number, complement, person, 1);
             hashTableInsert(residentTable, cpf, resident);
@@ -336,7 +340,7 @@ void commandLocQMark(FILE* txt, FILE* svg, HashTable saleTable, HashTable leasin
 
     if(isSaleLeasing(sale) == 1){
         char key[50];
-        sprintf(key, "%s/%c/%d", getSaleCep(sale), getSaleSide(sale), getSaleNumber(sale));
+        sprintf(key, "%s/%c/%d/%s", getSaleCep(sale), getSaleSide(sale), getSaleNumber(sale), getSaleComplement(sale));
         Leasing leasing = hashTableSearch(leasingTable, key);
         Resident resident = getLeasingResident(leasing);
         Person person = getResidentPerson(resident);
@@ -358,7 +362,7 @@ void commandDloc(FILE* txt, FILE* svg, HashTable saleTable, HashTable residentTa
     // Se ela tinha uma pessoa morando, reporta os dados e apaga o morador e a locação
     if(isSaleLeasing(sale) == 1){
         char key[50];
-        sprintf(key, "%s/%c/%d", getSaleCep(sale), getSaleSide(sale), getSaleNumber(sale));
+        sprintf(key, "%s/%c/%d/%s", getSaleCep(sale), getSaleSide(sale), getSaleNumber(sale), getSaleComplement(sale));
         Leasing leasing = hashTableSearch(leasingTable, key);
         Resident resident = getLeasingResident(leasing);
         Person person = getResidentPerson(resident);
@@ -371,12 +375,13 @@ void commandDloc(FILE* txt, FILE* svg, HashTable saleTable, HashTable residentTa
         fprintf(svg, "\t<text x=\"%lf\" y=\"40\"> Imóvel: Tamanho: %.2lf m², Valor: %.2lf mensais </text>\n", getLeasingX(leasing), getSaleAr(sale), getSaleV(sale));
     
 
-        leasingDelete(leasing);
-        hashTableRemove(leasingTable, key);
-
         char* cpf = getResidentCpf(resident);
         residentDelete(resident);
         hashTableRemove(residentTable, cpf);
+        
+        leasingDelete(leasing);
+        hashTableRemove(leasingTable, key);
+
 
     // Se não só reporta os dados
     }else if(isSaleLeasing(sale) == 0){
@@ -399,8 +404,12 @@ void commandHom(FILE* txt, FILE* svg, HashTable leasingTable, HashTable resident
         for(NodeL nodeAux = getListFirst(list); nodeAux; nodeAux = getListNext(nodeAux)){
             Resident resident = getHashTableListItem(getListInfo(nodeAux));
 
+            if(resident == NULL){
+                continue;
+            }
+
             char key[50];
-            sprintf(key,"%s/%c/%d", getResidentCep(resident), getResidentSide(resident), getResidentNumber(resident));
+            sprintf(key,"%s/%c/%d/%s", getResidentCep(resident), getResidentSide(resident), getResidentNumber(resident), getResidentComplement(resident));
             Leasing leasing = hashTableSearch(leasingTable, key);
 
             double xAux = getLeasingX(leasing);
@@ -431,8 +440,12 @@ void commandMul(FILE* txt, FILE* svg, HashTable leasingTable, HashTable resident
         for(NodeL nodeAux = getListFirst(list); nodeAux; nodeAux = getListNext(nodeAux)){
             Resident resident = getHashTableListItem(getListInfo(nodeAux));
 
+            if(resident == NULL){
+                continue;
+            }
+
             char key[50];
-            sprintf(key,"%s/%c/%d", getResidentCep(resident), getResidentSide(resident), getResidentNumber(resident));
+            sprintf(key,"%s/%c/%d/%s", getResidentCep(resident), getResidentSide(resident), getResidentNumber(resident), getResidentComplement(resident));
             Leasing leasing = hashTableSearch(leasingTable, key);
 
             double xAux = getLeasingX(leasing);

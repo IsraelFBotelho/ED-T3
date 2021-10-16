@@ -63,8 +63,8 @@ void readPm(char* path, char* name, City city, HashTable* personTable, HashTable
                 Person person = hashTableSearch(*personTable, cpf);
 
                 if(person != NULL){
-                    char key[100];
-                    sprintf(key, "%s/%c/%d", cep, side, number);
+                    char key[200];
+                    sprintf(key, "%s/%c/%d/%s", cep, side, number, complement);
                     hashTableInsert(*leasingTable, key, leasing);
                     Resident resident = residentCreate(cpf, cep, side, number, complement, person, 0);
                     hashTableInsert(*residentTable, cpf, resident);
